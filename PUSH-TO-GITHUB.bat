@@ -4,9 +4,8 @@ color 0B
 echo ======================================================================
 echo           KSR CampusGuard - Git Push to GitHub Utility
 echo ======================================================================
-echo.
 cd /d "%~dp0"
-set "PATH=%~dp0bin\git\cmd;%PATH%"
+set "PATH=%~dp0bin\git\cmd;%~dp0bin\git\mingw64\bin;d:\Antigravity IDE\emergency-campus-dashboard\bin\git\cmd;d:\Antigravity IDE\emergency-campus-dashboard\bin\git\mingw64\bin;%PATH%"
 
 echo [*] Remote Repository: https://github.com/udhayagiri380-bit/campus-guard.git
 echo [*] Current Branch: main
