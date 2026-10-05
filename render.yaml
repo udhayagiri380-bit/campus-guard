@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: ksr-campusguard
+    runtime: node
+    plan: free
+    buildCommand: ""
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: PUBLIC_DOMAIN
+        value: https://ksr-campusguard.onrender.com

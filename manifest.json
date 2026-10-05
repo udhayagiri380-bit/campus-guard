@@ -1,0 +1,11 @@
+{
+  "name": "Student Emergency Ambulance Portal",
+  "short_name": "KSR Ambulance",
+  "description": "KSR Institution Student Emergency Ambulance & Driver Dispatch Portal",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#070d18",
+  "theme_color": "#dc2626",
+  "orientation": "any"
+}

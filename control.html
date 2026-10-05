@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KSR Institutions — Campus Emergency Control Center</title>
+  <meta name="description"
+    content="KSR INSTITUTIONS Emergency Command & Control Center. Live campus map, emergency feed, ambulance dispatch monitor, and QR code access for mobile phones.">
+  <meta name="theme-color" content="#0b1329">
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #070e1c;
+      --panel: #0d172c;
+      --card-border: #1a2c4e;
+      --primary: #dc2626;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: #050a14;
+      border-bottom: 2px solid #2563eb;
+      padding: 14px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      background: #2563eb;
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+    }
+
+    .brand-title h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .brand-title p {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-link-btn {
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid #334155;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 9px;
+      font-weight: 700;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-link-btn.sos {
+      background: #dc2626;
+      color: white;
+      border-color: #dc2626;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .grid-top {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .metric-card {
+      background: var(--panel);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .panel-head h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* INCIDENT TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .badge.reported {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+    }
+
+    .badge.accepted {
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+    }
+
+    .badge.arrived {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fde68a;
+    }
+
+    .badge.picked_up {
+      background: rgba(168, 85, 247, 0.2);
+      color: #d8b4fe;
+    }
+
+    .badge.resolved {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+    }
+
+    /* QR CODE ACCESS CARD */
+    .qr-card {
+      background: #081224;
+      border: 1px solid #1e3a8a;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .qr-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 6px;
+    }
+
+    .qr-card p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .qr-img {
+      background: white;
+      padding: 8px;
+      border-radius: 10px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+
+    .qr-url-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #34d399;
+      background: #040914;
+      padding: 8px 12px;
+      border-radius: 8px;
+      word-break: break-all;
+    }
+
+    .map-box {
+      height: 320px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      margin-top: 10px;
+    }
+
+    .map-box iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="brand">
+      <div class="brand-icon"><i class="fa-solid fa-tower-broadcast"></i></div>
+      <div class="brand-title">
+        <h1>KSR INSTITUTIONS — EMERGENCY CONTROL CENTER</h1>
+        <p>Security Directorate • Centralized Command & Threat Monitor</p>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-link-btn sos"><i class="fa-solid fa-mobile-screen"></i> Student SOS Portal</a>
+      <a href="/ambulance" class="nav-link-btn"><i class="fa-solid fa-truck-medical"></i> Ambulance Dispatch</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid-top">
+      <div class="metric-card">
+        <div>
+          <div class="metric-label">Total Emergencies</div>
+          <div class="metric-val" id="totalIncidents">0</div>
+        </div>
+        <i class="fa-solid fa-layer-group" style="font-size: 26px; color: #38bdf8;"></i>
+      </div>
+      <div class="metric-card">
+        <div>
+          <div class="metric-label">Active / Pending</div>
+          <div class="metric-val" id="activeIncidents" style="color: #ef4444;">0</div>
+        </div>
+        <i class="fa-solid fa-bell" style="font-size: 26px; color: #ef4444;"></i>
+      </div>
+      <div class="metric-card">
+        <div>
+          <div class="metric-label">Ambulances En Route</div>
+          <div class="metric-val" id="dispatchedAmbulances" style="color: #f59e0b;">0</div>
+        </div>
+        <i class="fa-solid fa-truck-fast" style="font-size: 26px; color: #f59e0b;"></i>
+      </div>
+      <div class="metric-card">
+        <div>
+          <div class="metric-label">Resolved Incidents</div>
+          <div class="metric-val" id="resolvedIncidents" style="color: #10b981;">0</div>
+        </div>
+        <i class="fa-solid fa-shield-heart" style="font-size: 26px; color: #10b981;"></i>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <!-- LEFT: INCIDENTS LOG -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> Live Campus Emergency Log</h2>
+          <span style="font-size: 12px; color: #34d399; font-weight: 700;"><i class="fa-solid fa-circle-dot"></i> Live
+            Stream</span>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Reporter / Phone</th>
+                <th>Photo</th>
+                <th>Status</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="incidentRows">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--muted); padding: 30px;">Loading live emergency
+                  logs...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RIGHT: MOBILE ACCESS & MAP -->
+      <div>
+        <!-- QR CODE TO SCAN WITH ANDROID PHONES -->
+        <div class="qr-card">
+          <h3><i class="fa-solid fa-qrcode"></i> Public Android / Mobile Access</h3>
+          <p>Scan with any phone camera anywhere on 4G, 5G, or Wi-Fi to open the SOS portal:</p>
+          <div class="qr-img" id="qrContainer">
+            <!-- QR code generated dynamically -->
+          </div>
+          <div class="qr-url-text" id="mobileUrlDisplay">https://ksr-campusguard.onrender.com/</div>
+        </div>
+
+        <!-- CAMPUS TACTICAL MAP -->
+        <div class="panel">
+          <div class="panel-head">
+            <h2><i class="fa-solid fa-map-location" style="color: #38bdf8;"></i> KSR Institutions Campus</h2>
+          </div>
+          <div class="map-box">
+            <iframe title="KSR Institutions Campus"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=77.815%2C11.345%2C77.842%2C11.368&layer=mapnik&marker=11.3564%2C77.8282"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const $ = id => document.getElementById(id);
+
+      function updateMobileQrDisplay(url) {
+        if (!url) return;
+        $("mobileUrlDisplay").textContent = url;
+        const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(url)}`;
+        $("qrContainer").innerHTML = `<img src="${qrSrc}" width="160" height="160" alt="Mobile QR Code">`;
+      }
+
+      async function loadSystemHealth() {
+        try {
+          const res = await fetch("/api/health");
+          if (!res.ok) return;
+          const data = await res.json();
+          const isRemote = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+          let mobileUrl = "";
+          if (isRemote) {
+            mobileUrl = window.location.origin + "/";
+          } else if (data.publicUrl) {
+            mobileUrl = data.publicUrl + (data.publicUrl.endsWith("/") ? "" : "/");
+          } else {
+            const hostIp = data.networkIp || window.location.hostname;
+            mobileUrl = `http://${hostIp}:${data.activePort || 5000}/`;
+          }
+          updateMobileQrDisplay(mobileUrl);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      async function loadIncidents() {
+        try {
+          const res = await fetch("/api/incidents");
+          if (!res.ok) return;
+          const list = await res.json();
+
+          $("totalIncidents").textContent = list.length;
+          $("activeIncidents").textContent = list.filter(i => !['RESOLVED', 'CANCELLED'].includes(i.status)).length;
+          $("dispatchedAmbulances").textContent = list.filter(i => ['ACCEPTED', 'ARRIVED', 'PICKED_UP'].includes(i.status)).length;
+          $("resolvedIncidents").textContent = list.filter(i => i.status === 'RESOLVED').length;
+
+          const tbody = $("incidentRows");
+          if (list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 25px;">No incidents recorded yet.</td></tr>`;
+            return;
+          }
+
+          tbody.innerHTML = list.map(i => `
+            <tr>
+              <td style="font-family: 'JetBrains Mono'; font-weight: 700; color: #38bdf8;">${i.id}</td>
+              <td style="font-weight: 700; color: #fff;">${i.type}</td>
+              <td style="color: #cbd5e1;">${i.location}</td>
+              <td>${i.reporter || 'Anonymous'} ${i.phone ? `<br><a href="tel:${i.phone}" style="color: #34d399; text-decoration: none;"><i class="fa-solid fa-phone"></i> ${i.phone}</a>` : ''}</td>
+              <td>${i.photo_url ? `<a href="${i.photo_url}" target="_blank"><img src="${i.photo_url}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid #38bdf8;"></a>` : '<span style="color: #64748b;">No photo</span>'}</td>
+              <td><span class="badge ${i.status.toLowerCase()}">${i.status}</span></td>
+              <td style="color: #94a3b8; font-size: 11px;">${new Date(i.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+            </tr>
+          `).join("");
+
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      // REAL-TIME STREAM
+      if (window.EventSource) {
+        const stream = new EventSource("/api/stream");
+        stream.addEventListener("incident:new", () => loadIncidents());
+        stream.addEventListener("incident:update", () => loadIncidents());
+        stream.addEventListener("incident:deleted", () => loadIncidents());
+        stream.addEventListener("tunnel:ready", e => {
+          try {
+            const ev = JSON.parse(e.data);
+            if (ev.publicUrl) updateMobileQrDisplay(ev.publicUrl + "/");
+          } catch (err) { }
+        });
+      }
+
+      loadSystemHealth();
+      loadIncidents();
+      setInterval(loadIncidents, 3000);
+      setInterval(loadSystemHealth, 4000);
+    })();
+  </script>
+</body>
+
+</html>

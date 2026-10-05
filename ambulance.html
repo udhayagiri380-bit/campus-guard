@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KSR INSTITUTIONS — Ambulance Portal</title>
+  <meta name="description"
+    content="Tactical Ambulance Driver & Paramedic Dispatch Terminal for KSR Institution. Real-time emergency callout, high-resolution student injury/scene photo viewer, one-tap dialing, and live GPS turn-by-turn navigation.">
+  <meta name="theme-color" content="#b91c1c">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap"
+    rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #dc2626;
+      --primary-dark: #991b1b;
+      --bg: #070e1c;
+      --panel: #0d172c;
+      --card-border: #1a2c4e;
+      --card-hover: #152545;
+      --accent: #38bdf8;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOP HEADER */
+    .topbar {
+      background: #050a14;
+      border-bottom: 2px solid #b91c1c;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .fleet-badge {
+      background: #dc2626;
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      box-shadow: 0 0 18px rgba(220, 38, 38, 0.5);
+    }
+
+    .brand-text h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .siren-toggle-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .siren-toggle-btn.active {
+      background: rgba(220, 38, 38, 0.2);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    .driver-status-select {
+      background: #0f1f3d;
+      border: 1.5px solid #10b981;
+      color: #34d399;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    /* FLASH ALERT BANNER */
+    .flash-alert-banner {
+      display: none;
+      background: linear-gradient(90deg, #dc2626, #991b1b);
+      color: white;
+      padding: 12px 18px;
+      text-align: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      animation: alertPulse 1s infinite alternate;
+    }
+
+    @keyframes alertPulse {
+      from {
+        background-color: #dc2626;
+        box-shadow: 0 0 10px #dc2626;
+      }
+
+      to {
+        background-color: #7f1d1d;
+        box-shadow: 0 0 30px #ef4444;
+      }
+    }
+
+    /* MAIN LAYOUT */
+    .container {
+      max-width: 1350px;
+      margin: 0 auto;
+      padding: 16px;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* STATS METRIC BAR */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stat-card {
+      background: var(--panel);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stat-meta h4 {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .stat-meta .stat-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+    }
+
+    .stat-icon.red {
+      background: rgba(220, 38, 38, 0.15);
+      color: #ef4444;
+    }
+
+    .stat-icon.amber {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+    }
+
+    .stat-icon.green {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+    }
+
+    /* GRID: QUEUE & DETAIL */
+    .dispatch-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .card-head h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* FILTER TABS */
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+    }
+
+    .filter-btn {
+      background: #091326;
+      border: 1px solid var(--card-border);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .filter-btn.active {
+      background: #dc2626;
+      color: #fff;
+      border-color: #dc2626;
+    }
+
+    /* QUEUE CARDS */
+    .queue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: 720px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .incident-ticket {
+      background: #091326;
+      border: 1.5px solid var(--card-border);
+      border-radius: 14px;
+      padding: 16px;
+      transition: all 0.2s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .incident-ticket:hover {
+      border-color: #3b82f6;
+      background: #0c1a36;
+    }
+
+    .incident-ticket.selected {
+      border-color: #ef4444;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+      background: #0d1e40;
+    }
+
+    .incident-ticket.critical {
+      border-left: 6px solid #ef4444;
+    }
+
+    .incident-ticket.high {
+      border-left: 6px solid #f59e0b;
+    }
+
+    .ticket-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .ticket-type {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .badge-status {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-status.reported {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid #ef4444;
+    }
+
+    .badge-status.accepted {
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+      border: 1px solid #3b82f6;
+    }
+
+    .badge-status.arrived {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fde68a;
+      border: 1px solid #f59e0b;
+    }
+
+    .badge-status.picked_up {
+      background: rgba(168, 85, 247, 0.2);
+      color: #d8b4fe;
+      border: 1px solid #a855f7;
+    }
+
+    .badge-status.resolved {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+      border: 1px solid #10b981;
+    }
+
+    .ticket-location {
+      font-size: 14px;
+      font-weight: 700;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .ticket-reporter {
+      font-size: 12px;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ticket-reporter span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .ticket-desc {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 12px;
+      background: #060d1c;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border-left: 3px solid #334155;
+    }
+
+    /* STUDENT'S PHOTO IN TICKET */
+    .ticket-photo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      background: #050a14;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #1e293b;
+    }
+
+    .thumb-img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #38bdf8;
+      cursor: zoom-in;
+      transition: transform 0.2s;
+    }
+
+    .thumb-img:hover {
+      transform: scale(1.05);
+    }
+
+    .photo-desc-tag {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .btn-zoom-photo {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #38bdf8;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ACTION BUTTONS IN TICKET */
+    .ticket-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .btn-action {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-dispatch {
+      background: #2563eb;
+      color: white;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-dispatch:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-arrived {
+      background: #f59e0b;
+      color: #0f172a;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    }
+
+    .btn-arrived:hover {
+      background: #d97706;
+    }
+
+    .btn-pickup {
+      background: #8b5cf6;
+      color: white;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    }
+
+    .btn-pickup:hover {
+      background: #7c3aed;
+    }
+
+    .btn-complete {
+      background: #10b981;
+      color: white;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-complete:hover {
+      background: #059669;
+    }
+
+    .btn-call-student {
+      background: #059669;
+      color: white;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 8px 14px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-nav-gps {
+      background: #0284c7;
+      color: white;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 8px 14px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* DETAIL & MAP PANEL */
+    .detail-view {
+      position: sticky;
+      top: 80px;
+    }
+
+    .map-frame {
+      height: 320px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      margin: 12px 0;
+    }
+
+    .map-frame iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* LIGHTBOX MODAL FOR ZOOMING STUDENT PHOTOS */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .lightbox-modal.show {
+      display: grid;
+    }
+
+    .lightbox-box {
+      max-width: 900px;
+      width: 100%;
+      background: #0d172c;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 16px;
+      position: relative;
+    }
+
+    .lightbox-img {
+      width: 100%;
+      max-height: 75vh;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+
+    .lightbox-close-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+
+
+    /* AUTHENTICATION OVERLAY & TABS */
+    .driver-login-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 9, 20, 0.94);
+      backdrop-filter: blur(14px);
+      z-index: 999999;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .driver-login-overlay.hidden {
+      display: none !important;
+    }
+
+    .driver-login-box {
+      max-width: 480px;
+      width: 100%;
+      background: #0d172c;
+      border: 1.5px solid rgba(220, 38, 38, 0.5);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(220, 38, 38, 0.25);
+      animation: modalFadeIn 0.25s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .login-brand-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #dc2626, #991b1b);
+      border-radius: 16px;
+      display: inline-grid;
+      place-items: center;
+      font-size: 28px;
+      color: white;
+      margin-bottom: 12px;
+      box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+    }
+
+    .driver-login-box h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .login-sub {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 18px;
+    }
+
+    /* Auth Tabs */
+    .auth-tab-bar {
+      display: flex;
+      background: #070e1c;
+      border: 1px solid #1a2c4e;
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 20px;
+      gap: 6px;
+    }
+
+    .auth-tab-btn {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .auth-tab-btn.active {
+      background: #dc2626;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+    }
+
+    .login-form {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .login-input-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .login-input-group input {
+      width: 100%;
+      background: #070e1c;
+      border: 1.5px solid #1a2c4e;
+      border-radius: 10px;
+      padding: 11px 13px;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .login-input-group input:focus {
+      border-color: #ef4444;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
+    }
+
+    .login-error-msg {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #fca5a5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .login-success-msg {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10b981;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #6ee7b7;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-driver-auth-action {
+      width: 100%;
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+      transition: all 0.2s;
+      margin-top: 4px;
+    }
+
+    .btn-driver-auth-action:hover {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(220, 38, 38, 0.55);
+    }
+
+    .login-hint-box {
+      margin-top: 18px;
+      background: rgba(14, 28, 55, 0.6);
+      border: 1px dashed #263c66;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: left;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .hint-title {
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hint-creds code {
+      background: #070e1c;
+      color: #facc15;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .driver-profile-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #0f1c36;
+      border: 1px solid #1e355f;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+
+    .btn-logout-small {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-logout-small:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    /* EMPTY QUEUE PLACEHOLDER */
+    .empty-queue {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    .empty-queue i {
+      font-size: 48px;
+      color: #334155;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 960px) {
+      .dispatch-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-view {
+        position: static;
+      }
+
+      .brand-text h1 {
+        font-size: 16px;
+      }
+
+      .topbar {
+        padding: 10px 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- DRIVER AUTHENTICATION MODAL (LOGIN & SIGN UP TABS) -->
+  <div class="driver-login-overlay" id="driverLoginOverlay">
+    <div class="driver-login-box">
+      <div class="login-brand-icon">
+        <i class="fa-solid fa-truck-medical"></i>
+      </div>
+      <h2>KSR INSTITUTION AMBULANCE PORTAL</h2>
+      <p class="login-sub">Tactical Driver & Paramedic Terminal Access</p>
+
+      <!-- TABS: LOGIN OR SIGN UP -->
+      <div class="auth-tab-bar">
+        <button type="button" class="auth-tab-btn active" id="tabBtnLogin">
+          <i class="fa-solid fa-right-to-bracket"></i> Driver Login
+        </button>
+        <button type="button" class="auth-tab-btn" id="tabBtnRegister">
+          <i class="fa-solid fa-user-plus"></i> New Driver Sign Up
+        </button>
+      </div>
+
+      <!-- TAB 1: LOGIN FORM -->
+      <form id="driverLoginForm" class="login-form">
+        <div class="login-input-group">
+          <label for="loginUsername"><i class="fa-solid fa-user-astronaut"></i> Driver Login ID / Username</label>
+          <input type="text" id="loginUsername" placeholder="e.g. driver108" autocomplete="username" required>
+        </div>
+
+        <div class="login-input-group">
+          <label for="loginPassword"><i class="fa-solid fa-key"></i> Security Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password"
+            required>
+        </div>
+
+        <div class="login-error-msg" id="loginErrorMsg" style="display: none;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span id="loginErrorText">Invalid driver username or password.</span>
+        </div>
+
+        <button type="submit" class="btn-driver-auth-action" id="btnSubmitLogin">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>VERIFY & ENTER TACTICAL TERMINAL</span>
+        </button>
+
+        <div class="login-hint-box">
+          <div class="hint-title"><i class="fa-solid fa-circle-info"></i> Default Registered Ambulance Accounts:</div>
+          <div class="hint-creds">
+            <div><b>Unit 108:</b> <code>driver108</code> / <code>ksr108</code></div>
+            <div><b>Unit 102:</b> <code>ambulance</code> / <code>ksr108</code></div>
+          </div>
+        </div>
+      </form>
+
+      <!-- TAB 2: SIGN UP / REGISTER FORM (NEW DRIVER) -->
+      <form id="driverRegisterForm" class="login-form" style="display: none;">
+        <div class="login-input-group">
+          <label for="regDriverName"><i class="fa-solid fa-user-tie"></i> Driver Full Name</label>
+          <input type="text" id="regDriverName" placeholder="e.g. Thiru. M. Velusamy" required>
+        </div>
+
+        <div class="login-input-group">
+          <label for="regVehicleNo"><i class="fa-solid fa-truck-medical"></i> Vehicle / Ambulance Reg No.</label>
+          <input type="text" id="regVehicleNo" placeholder="e.g. TN-28-KSR-108" required>
+        </div>
+
+        <div class="login-input-group">
+          <label for="regUsername"><i class="fa-solid fa-user-astronaut"></i> Desired Login ID / Username</label>
+          <input type="text" id="regUsername" placeholder="e.g. driver_velu" autocomplete="username" required>
+        </div>
+
+        <div class="login-input-group">
+          <label for="regPassword"><i class="fa-solid fa-key"></i> Security Password</label>
+          <input type="password" id="regPassword" placeholder="Create a password (min 4 characters)"
+            autocomplete="new-password" required>
+        </div>
+
+        <div class="login-error-msg" id="regErrorMsg" style="display: none;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span id="regErrorText">Registration error.</span>
+        </div>
+
+        <div class="login-success-msg" id="regSuccessMsg" style="display: none;">
+          <i class="fa-solid fa-circle-check"></i>
+          <span id="regSuccessText">Account created! Logging in...</span>
+        </div>
+
+        <button type="submit" class="btn-driver-auth-action" id="btnSubmitRegister">
+          <i class="fa-solid fa-user-plus"></i>
+          <span>CREATE ACCOUNT & ENTER TERMINAL</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- TOP HEADER -->
+  <header class="topbar">
+    <div class="brand-group">
+      <div class="fleet-badge">
+        <i class="fa-solid fa-truck-medical"></i>
+      </div>
+      <div class="brand-text">
+        <h1>KSR INSTITUTIONS AMBULANCE PORTAL</h1>
+        <p>CampusGuard Tactical Emergency Dispatch</p>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <!-- DRIVER PROFILE & LOGOUT -->
+      <div class="driver-profile-pill" id="driverProfilePill" style="display: none;">
+        <i class="fa-solid fa-id-badge" style="color: #38bdf8;"></i>
+        <span id="driverProfileText">Driver: S. Murugan (Unit: TN-28-KSR-108)</span>
+        <button type="button" class="btn-logout-small" id="btnLogout" title="Logout Driver">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+
+      <!-- SIREN MUTE TOGGLE -->
+      <button class="siren-toggle-btn active" id="btnToggleSiren">
+        <i class="fa-solid fa-bell"></i>
+        <span id="sirenText">SIREN ALERT ON</span>
+      </button>
+
+      <!-- DRIVER DUTY SELECTOR -->
+      <select class="driver-status-select" id="driverDutySelect">
+        <option value="AVAILABLE">🟢 ON DUTY / AVAILABLE</option>
+        <option value="DISPATCHED">🟡 DISPATCHED / EN ROUTE</option>
+        <option value="OFF_DUTY">🔴 OFF DUTY</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- FLASH ALERT FOR NEW INCOMING EMERGENCIES -->
+  <div class="flash-alert-banner" id="flashBanner">
+    🚨 NEW EMERGENCY REPORT RECEIVED! IMMEDIATE DISPATCH REQUIRED! 🚨
+  </div>
+
+  <main class="container">
+    <!-- METRIC STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-meta">
+          <h4>New Emergency Calls</h4>
+          <div class="stat-val" id="metricNew" style="color: #ef4444;">0</div>
+        </div>
+        <div class="stat-icon red"><i class="fa-solid fa-bell"></i></div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-meta">
+          <h4>Ambulance In-Transit</h4>
+          <div class="stat-val" id="metricActive" style="color: #f59e0b;">0</div>
+        </div>
+        <div class="stat-icon amber"><i class="fa-solid fa-truck-fast"></i></div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-meta">
+          <h4>Resolved / Picked Up</h4>
+          <div class="stat-val" id="metricResolved" style="color: #10b981;">0</div>
+        </div>
+        <div class="stat-icon green"><i class="fa-solid fa-check-double"></i></div>
+      </div>
+    </div>
+
+    <!-- MAIN DISPATCH GRID -->
+    <div class="dispatch-grid">
+      <!-- LEFT: INCIDENT QUEUE -->
+      <div class="card">
+        <div class="card-head">
+          <h2>
+            <i class="fa-solid fa-list-check" style="color: #38bdf8;"></i>
+            <span>Emergency Dispatch Queue</span>
+          </h2>
+          <div class="filter-tabs">
+            <button class="filter-btn active" data-filter="active">Active Calls</button>
+            <button class="filter-btn" data-filter="all">All Records</button>
+            <button class="filter-btn" data-filter="resolved">Completed</button>
+          </div>
+        </div>
+
+        <div class="queue-list" id="queueList">
+          <div class="empty-queue">
+            <i class="fa-solid fa-shield-heart"></i>
+            <h3>No Active Emergency Calls</h3>
+            <p>Waiting for student reports. When an emergency is submitted, it will ring the siren and appear here
+              immediately.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: DETAIL & TACTICAL MAP -->
+      <div class="card detail-view">
+        <div class="card-head">
+          <h2>
+            <i class="fa-solid fa-map-location-dot" style="color: #f59e0b;"></i>
+            <span id="selectedTitle">Selected Incident Navigation</span>
+          </h2>
+        </div>
+
+        <div id="detailContent">
+          <p style="color: #94a3b8; font-size: 13px; margin-bottom: 12px;">Select an emergency card from the left queue
+            to view turn-by-turn campus navigation, caller details, and high-resolution scene photo.</p>
+        </div>
+
+        <div class="map-frame" id="mapFrame">
+          <iframe id="mapIframe" title="Campus Emergency Location"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=77.815%2C11.345%2C77.842%2C11.368&layer=mapnik&marker=11.3564%2C77.8282"></iframe>
+        </div>
+
+        <div id="navActionArea">
+          <!-- Populated when incident selected -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- LIGHTBOX MODAL FOR ZOOMING STUDENT PHOTOS -->
+  <div class="lightbox-modal" id="lightboxModal">
+    <div class="lightbox-box">
+      <button class="lightbox-close-btn" id="btnCloseLightbox">&times;</button>
+      <img src="" class="lightbox-img" id="lightboxImg" alt="Enlarged Incident Photo">
+      <div
+        style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center; color: #94a3b8; font-size: 13px;">
+        <span id="lightboxCaption">Student uploaded incident picture</span>
+        <a id="lightboxDownloadBtn" href="#" target="_blank" download="incident.jpg"
+          style="color: #38bdf8; text-decoration: none; font-weight: 700;">
+          <i class="fa-solid fa-arrow-down"></i> Open Full Quality
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      let incidentsCache = [];
+      let selectedIncidentId = null;
+      let activeFilter = 'active';
+      let sirenEnabled = true;
+      let audioCtx = null;
+      let knownIds = new Set();
+
+      const $ = id => document.getElementById(id);
+
+      // ==========================================
+      // SYNTHESIZED TACTICAL AMBULANCE SIREN
+      // ==========================================
+      // ==========================================
+      // 2-SECOND EMERGENCY INTIMATION SIREN
+      // Sounds for exactly 2 seconds when an emergency report is received
+      // ==========================================
+      function playAmbulanceSiren() {
+        if (!sirenEnabled) return;
+        try {
+          if (!audioCtx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+          }
+          if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = 'sawtooth';
+          gain.gain.setValueAtTime(0.32, now);
+
+          // Exactly 2-Second Tactical Ambulance Hi-Lo Siren:
+          // 4 alternating tones of 0.50 seconds each = exactly 2.0 seconds
+          osc.frequency.setValueAtTime(960, now);          // 0.00s - 0.50s: 960Hz (Hi)
+          osc.frequency.setValueAtTime(770, now + 0.50);   // 0.50s - 1.00s: 770Hz (Lo)
+          osc.frequency.setValueAtTime(960, now + 1.00);   // 1.00s - 1.50s: 960Hz (Hi)
+          osc.frequency.setValueAtTime(770, now + 1.50);   // 1.50s - 2.00s: 770Hz (Lo)
+
+          // Smooth exponential ramp down at 2.0s
+          gain.gain.setValueAtTime(0.32, now + 1.95);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.00);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now);
+          osc.stop(now + 2.00);
+          console.log("[SIREN] 2-second emergency report intimation siren played!");
+        } catch (e) {
+          console.warn("Audio playback error:", e);
+        }
+      }
+
+
+
+      // ==========================================
+      // AMBULANCE DRIVER AUTHENTICATION SYSTEM (LOGIN & SIGN UP)
+      // ==========================================
+      let currentDriver = null;
+      let driverLocation = null;
+
+      function updateDriverLocation() {
+        if (!navigator.geolocation) return;
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            driverLocation = {
+              lat: parseFloat(pos.coords.latitude.toFixed(6)),
+              lng: parseFloat(pos.coords.longitude.toFixed(6))
+            };
+            const badge = $("driverProfileText");
+            if (badge && currentDriver) {
+              badge.innerHTML = `Driver: ${currentDriver.driver_name || currentDriver.username} (${currentDriver.vehicle_no || 'TN-28-KSR-108'}) <span style="color:#34d399;font-size:11px;">📍 GPS Active</span>`;
+            }
+          },
+          err => console.log("Driver location error:", err.message),
+          { enableHighAccuracy: true, timeout: 8000 }
+        );
+      }
+
+      function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+        const R = 6371e3;
+        const phi1 = lat1 * Math.PI / 180;
+        const phi2 = lat2 * Math.PI / 180;
+        const dPhi = (lat2 - lat1) * Math.PI / 180;
+        const dLam = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
+                  Math.cos(phi1) * Math.cos(phi2) *
+                  Math.sin(dLam/2) * Math.sin(dLam/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return Math.round(R * c);
+      }
+
+      function getDistanceBadge(item) {
+        if (!driverLocation || !item.latitude || !item.longitude) return '';
+        const meters = calculateDistanceMeters(driverLocation.lat, driverLocation.lng, item.latitude, item.longitude);
+        const text = meters < 1000 ? `${meters}m away` : `${(meters/1000).toFixed(1)}km away`;
+        return `<span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-weight: 700; margin-left: auto;">📍 ~${text}</span>`;
+      }
+
+      function checkDriverAuth() {
+        const saved = localStorage.getItem("ksr_driver_auth");
+        if (saved) {
+          try {
+            currentDriver = JSON.parse(saved);
+            showAuthenticatedDriver(currentDriver);
+            return true;
+          } catch (e) { }
+        }
+        showLoginModal();
+        return false;
+      }
+
+      function showLoginModal() {
+        const overlay = $("driverLoginOverlay");
+        if (overlay) overlay.classList.remove("hidden");
+        const pill = $("driverProfilePill");
+        if (pill) pill.style.display = "none";
+        setTimeout(() => {
+          const u = $("loginUsername");
+          if (u) u.focus();
+        }, 150);
+      }
+
+      function showAuthenticatedDriver(driver) {
+        const overlay = $("driverLoginOverlay");
+        if (overlay) overlay.classList.add("hidden");
+        const pill = $("driverProfilePill");
+        if (pill) pill.style.display = "inline-flex";
+        const txt = $("driverProfileText");
+        if (txt) {
+          txt.textContent = `Driver: ${driver.driver_name || driver.name || driver.username} (${driver.vehicle_no || 'TN-28-KSR-108'})`;
+        }
+
+        // Unlock audio context on login
+        try {
+          if (!audioCtx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+          }
+          if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+        } catch (e) { }
+      }
+
+      // TAB SWITCHING: LOGIN VS SIGN UP
+      $("tabBtnLogin").addEventListener("click", () => {
+        $("tabBtnLogin").classList.add("active");
+        $("tabBtnRegister").classList.remove("active");
+        $("driverLoginForm").style.display = "flex";
+        $("driverRegisterForm").style.display = "none";
+        $("loginErrorMsg").style.display = "none";
+      });
+
+      $("tabBtnRegister").addEventListener("click", () => {
+        $("tabBtnRegister").classList.add("active");
+        $("tabBtnLogin").classList.remove("active");
+        $("driverLoginForm").style.display = "none";
+        $("driverRegisterForm").style.display = "flex";
+        $("regErrorMsg").style.display = "none";
+      });
+
+      // LOGIN SUBMIT
+      $("driverLoginForm").addEventListener("submit", async e => {
+        e.preventDefault();
+        const username = $("loginUsername").value.trim();
+        const password = $("loginPassword").value.trim();
+        const btn = $("btnSubmitLogin");
+        const errMsg = $("loginErrorMsg");
+        const errTxt = $("loginErrorText");
+
+        errMsg.style.display = "none";
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>AUTHENTICATING...</span>`;
+
+        try {
+          const res = await fetch("/api/driver/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+          });
+
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            throw new Error(data.error || "Invalid username or password.");
+          }
+
+          localStorage.setItem("ksr_driver_auth", JSON.stringify(data.driver));
+          currentDriver = data.driver;
+          showAuthenticatedDriver(data.driver);
+
+          // Initial incident fetch
+          fetchIncidents();
+        } catch (err) {
+          errTxt.textContent = err.message || "Invalid credentials.";
+          errMsg.style.display = "flex";
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-shield-halved"></i> <span>VERIFY & ENTER TACTICAL TERMINAL</span>`;
+        }
+      });
+
+      // SIGN UP / REGISTER SUBMIT (NEW DRIVER)
+      $("driverRegisterForm").addEventListener("submit", async e => {
+        e.preventDefault();
+        const driver_name = $("regDriverName").value.trim();
+        const vehicle_no = $("regVehicleNo").value.trim();
+        const username = $("regUsername").value.trim();
+        const password = $("regPassword").value.trim();
+
+        const btn = $("btnSubmitRegister");
+        const errMsg = $("regErrorMsg");
+        const errTxt = $("regErrorText");
+        const succMsg = $("regSuccessMsg");
+
+        errMsg.style.display = "none";
+        succMsg.style.display = "none";
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>CREATING ACCOUNT...</span>`;
+
+        try {
+          const res = await fetch("/api/driver/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ driver_name, vehicle_no, username, password })
+          });
+
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            throw new Error(data.error || "Registration failed.");
+          }
+
+          succMsg.style.display = "flex";
+          localStorage.setItem("ksr_driver_auth", JSON.stringify(data.driver));
+          currentDriver = data.driver;
+
+          setTimeout(() => {
+            showAuthenticatedDriver(data.driver);
+            fetchIncidents();
+          }, 800);
+        } catch (err) {
+          errTxt.textContent = err.message || "Registration failed.";
+          errMsg.style.display = "flex";
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-user-plus"></i> <span>CREATE ACCOUNT & ENTER TERMINAL</span>`;
+        }
+      });
+
+      // LOGOUT
+      $("btnLogout").addEventListener("click", () => {
+        if (confirm("Log out of Ambulance Driver Terminal?")) {
+          localStorage.removeItem("ksr_driver_auth");
+          currentDriver = null;
+          showLoginModal();
+        }
+      });
+
+      // SIREN TOGGLE
+      $("btnToggleSiren").addEventListener("click", () => {
+        sirenEnabled = !sirenEnabled;
+        if (sirenEnabled) {
+          $("btnToggleSiren").classList.add("active");
+          $("sirenText").textContent = "SIREN ALERT ON";
+          playAmbulanceSiren();
+        } else {
+          $("btnToggleSiren").classList.remove("active");
+          $("sirenText").textContent = "SIREN MUTED";
+        }
+      });
+
+      // FILTER BUTTONS
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          activeFilter = btn.dataset.filter;
+          renderQueue();
+        });
+      });
+
+      // LIGHTBOX LOGIC
+      function openLightbox(url, caption) {
+        $("lightboxImg").src = url;
+        $("lightboxCaption").textContent = caption || "Incident Photo";
+        $("lightboxDownloadBtn").href = url;
+        $("lightboxModal").classList.add("show");
+      }
+      $("btnCloseLightbox").addEventListener("click", () => {
+        $("lightboxModal").classList.remove("show");
+      });
+      $("lightboxModal").addEventListener("click", e => {
+        if (e.target === $("lightboxModal")) $("lightboxModal").classList.remove("show");
+      });
+
+      // FETCH INCIDENTS
+      async function fetchIncidents() {
+        try {
+          const res = await fetch("/api/incidents");
+          if (!res.ok) return;
+          const fresh = await res.json();
+
+          // Check if there are brand new incidents to ring the siren
+          let hasNewReport = false;
+          fresh.forEach(item => {
+            if (!knownIds.has(item.id)) {
+              knownIds.add(item.id);
+              if (item.status === 'REPORTED') {
+                hasNewReport = true;
+              }
+            }
+          });
+
+          if (hasNewReport) {
+            playAmbulanceSiren();
+            const banner = $("flashBanner");
+            banner.style.display = "block";
+            setTimeout(() => { banner.style.display = "none"; }, 8000);
+          }
+
+          incidentsCache = fresh;
+          updateMetrics();
+          renderQueue();
+
+          // Maintain selected view or auto-awaken location system on new report
+          const activeOne = incidentsCache.find(i => i.status !== 'RESOLVED' && i.status !== 'CANCELLED');
+          if (activeOne) {
+            if (!selectedIncidentId || selectedIncidentId !== activeOne.id) {
+              updateDriverLocation();
+              selectIncident(activeOne.id);
+            } else {
+              const current = incidentsCache.find(i => i.id === selectedIncidentId);
+              if (current) renderDetail(current);
+            }
+          } else if (selectedIncidentId) {
+            const current = incidentsCache.find(i => i.id === selectedIncidentId);
+            if (current && current.status === 'RESOLVED') {
+              closeAmbulanceLocationForIncident(current.id);
+            }
+          }
+
+        } catch (e) {
+          console.error("Fetch error:", e);
+        }
+      }
+
+      function updateMetrics() {
+        const newCount = incidentsCache.filter(i => i.status === 'REPORTED').length;
+        const activeCount = incidentsCache.filter(i => ['ACCEPTED', 'ARRIVED', 'PICKED_UP'].includes(i.status)).length;
+        const resolvedCount = incidentsCache.filter(i => i.status === 'RESOLVED').length;
+
+        $("metricNew").textContent = newCount;
+        $("metricActive").textContent = activeCount;
+        $("metricResolved").textContent = resolvedCount;
+      }
+
+      // RENDER QUEUE
+      function renderQueue() {
+        let list = incidentsCache.slice();
+
+        if (activeFilter === 'active') {
+          list = list.filter(i => i.status !== 'RESOLVED' && i.status !== 'CANCELLED');
+        } else if (activeFilter === 'resolved') {
+          list = list.filter(i => i.status === 'RESOLVED');
+        }
+
+        const container = $("queueList");
+
+        if (list.length === 0) {
+          container.innerHTML = `
+            <div class="empty-queue">
+              <i class="fa-solid fa-shield-heart"></i>
+              <h3>No ${activeFilter === 'active' ? 'Active' : ''} Emergency Calls</h3>
+              <p>Queue is clear. Waiting for student reports.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = list.map(item => {
+          const isSelected = item.id === selectedIncidentId ? "selected" : "";
+          const pClass = (item.priority || "High").toLowerCase();
+          const sClass = (item.status || "REPORTED").toLowerCase();
+          const timeAgo = formatTime(item.created_at);
+
+          return `
+            <div class="incident-ticket ${pClass} ${isSelected}" onclick="window.selectIncident('${item.id}')">
+              <div class="ticket-top">
+                <div class="ticket-type">
+                  <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444; margin-right: 6px;"></i>
+                  ${item.type}
+                </div>
+                <span class="badge-status ${sClass}">${item.status}</span>
+              </div>
+
+              <div class="ticket-location">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>${item.location}</span>
+              </div>
+
+              ${item.latitude && item.longitude ? `
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: #34d399; margin: 4px 0 8px; font-family: 'JetBrains Mono', monospace; background: rgba(16, 185, 129, 0.1); padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                  <i class="fa-solid fa-location-crosshairs"></i>
+                  <span>GPS: ${item.latitude}, ${item.longitude}</span>
+                  ${getDistanceBadge(item)}
+                </div>
+              ` : ''}
+
+              <div class="ticket-reporter">
+                <span><i class="fa-solid fa-user"></i> ${item.reporter || 'Anonymous'}</span>
+                ${item.roll_no ? `<span><i class="fa-solid fa-id-card"></i> ${item.roll_no}</span>` : ''}
+                ${item.department ? `<span><i class="fa-solid fa-graduation-cap"></i> ${item.department}</span>` : ''}
+                <span><i class="fa-solid fa-clock"></i> ${timeAgo}</span>
+              </div>
+
+              ${item.description ? `<div class="ticket-desc">${escapeHtml(item.description)}</div>` : ''}
+
+              <!-- STUDENT UPLOADED PICTURE (DISPLAY PROMINENTLY) -->
+              ${item.photo_url ? `
+                <div class="ticket-photo-row">
+                  <img src="${item.photo_url}" class="thumb-img" alt="Student Photo" onclick="event.stopPropagation(); window.openLightbox('${item.photo_url}', '${escapeHtml(item.type)} - ${escapeHtml(item.location)}')">
+                  <div>
+                    <div style="font-weight: 700; color: #fff; font-size: 13px;">
+                      <i class="fa-solid fa-camera"></i> Student Photo Attached
+                    </div>
+                    <div class="photo-desc-tag">Tap thumbnail to enlarge image</div>
+                    <button type="button" class="btn-zoom-photo" onclick="event.stopPropagation(); window.openLightbox('${item.photo_url}', '${escapeHtml(item.type)} - ${escapeHtml(item.location)}')">
+                      <i class="fa-solid fa-magnifying-glass-plus"></i> View Full Photo
+                    </button>
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- ACTIONS -->
+              <div class="ticket-actions" onclick="event.stopPropagation()">
+                ${item.phone ? `
+                  <a href="tel:${item.phone}" class="btn-call-student">
+                    <i class="fa-solid fa-phone"></i> Call Student (${item.phone})
+                  </a>
+                ` : ''}
+
+                ${getGpsNavButton(item)}
+
+                ${item.status === 'REPORTED' ? `
+                  <button class="btn-action btn-dispatch" onclick="window.updateStatus('${item.id}', 'ACCEPTED')">
+                    <i class="fa-solid fa-bolt"></i> Accept & Dispatch Ambulance
+                  </button>
+                ` : ''}
+
+                ${item.status === 'ACCEPTED' ? `
+                  <button class="btn-action btn-arrived" onclick="window.updateStatus('${item.id}', 'ARRIVED')">
+                    <i class="fa-solid fa-location-dot"></i> Mark Arrived on Scene
+                  </button>
+                ` : ''}
+
+                ${item.status === 'ARRIVED' ? `
+                  <button class="btn-action btn-pickup" onclick="window.updateStatus('${item.id}', 'PICKED_UP')">
+                    <i class="fa-solid fa-user-injured"></i> Patient Picked Up (In Transit)
+                  </button>
+                ` : ''}
+
+                ${item.status === 'PICKED_UP' ? `
+                  <button class="btn-action btn-complete" onclick="window.updateStatus('${item.id}', 'RESOLVED')">
+                    <i class="fa-solid fa-check"></i> Handover Complete / Resolved
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      function getGpsNavButton(item) {
+        if (item.latitude && item.longitude) {
+          const originParam = (driverLocation && driverLocation.lat) ? `&origin=${driverLocation.lat},${driverLocation.lng}` : '';
+          const url = `https://www.google.com/maps/dir/?api=1${originParam}&destination=${item.latitude},${item.longitude}&travelmode=driving`;
+          return `
+            <a href="${url}" target="_blank" class="btn-nav-gps">
+              <i class="fa-solid fa-diamond-turn-right"></i> Start GPS Navigation
+            </a>
+          `;
+        }
+        const query = encodeURIComponent(item.location + " KSR Institutions Tiruchengode Tamil Nadu");
+        return `
+          <a href="https://www.google.com/maps/search/?api=1&query=${query}" target="_blank" class="btn-nav-gps">
+            <i class="fa-solid fa-diamond-turn-right"></i> Map Search
+          </a>
+        `;
+      }
+
+      // SELECT INCIDENT DETAIL
+      window.selectIncident = function (id) {
+        selectedIncidentId = id;
+        renderQueue();
+        const inc = incidentsCache.find(i => i.id === id);
+        if (inc) renderDetail(inc);
+      };
+
+      function renderDetail(inc) {
+        $("selectedTitle").textContent = `${inc.type} — ${inc.location}`;
+
+        $("detailContent").innerHTML = `
+          <div style="background: #091326; border: 1px solid #1a2c4e; border-radius: 12px; padding: 14px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-family: 'JetBrains Mono'; font-weight: 800; color: #38bdf8;">${inc.id}</span>
+              <span class="badge-status ${inc.status.toLowerCase()}">${inc.status}</span>
+            </div>
+            <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">
+              <b>Patient / Reporter:</b> ${inc.reporter || 'Anonymous'} ${inc.phone ? `(${inc.phone})` : ''}
+            </div>
+            <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">
+              <b>Location:</b> ${inc.location} ${inc.landmark ? `(${inc.landmark})` : ''}
+            </div>
+            ${inc.latitude ? `<div style="font-size: 12px; color: #34d399; font-family: 'JetBrains Mono';">GPS: ${inc.latitude}, ${inc.longitude}</div>` : ''}
+            ${inc.description ? `<p style="margin-top: 8px; font-size: 13px; color: #94a3b8; background: #050a14; padding: 8px; border-radius: 6px;">${escapeHtml(inc.description)}</p>` : ''}
+            
+            ${inc.photo_url ? `
+              <div style="margin-top: 10px;">
+                <b style="font-size: 12px; color: #fff; display: block; margin-bottom: 6px;">Student Picture:</b>
+                <img src="${inc.photo_url}" style="width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px; border: 1px solid #38bdf8; cursor: zoom-in;" onclick="window.openLightbox('${inc.photo_url}', '${escapeHtml(inc.type)}')">
+              </div>
+            ` : ''}
+          </div>
+        `;
+
+        // Update Map Marker
+        let lat = inc.latitude || 11.3564;
+        let lng = inc.longitude || 77.8282;
+        const bbox = `${(lng - 0.01).toFixed(4)}%2C${(lat - 0.01).toFixed(4)}%2C${(lng + 0.01).toFixed(4)}%2C${(lat + 0.01).toFixed(4)}`;
+        $("mapIframe").src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lng}`;
+
+        // Navigation CTA
+        $("navActionArea").innerHTML = `
+          <div style="display: flex; gap: 10px; margin-top: 12px;">
+            ${inc.phone ? `<a href="tel:${inc.phone}" class="btn-action btn-complete" style="flex: 1; justify-content: center;"><i class="fa-solid fa-phone"></i> Call Student</a>` : ''}
+            ${getGpsNavButton(inc)}
+          </div>
+        `;
+      }
+
+      // AUTOMATIC LOCATION SHUTDOWN & STANDBY FOR AMBULANCE (When service is resolved)
+      function closeAmbulanceLocationForIncident(id) {
+        $("selectedTitle").textContent = `Service Completed — Standby Mode`;
+        $("detailContent").innerHTML = `
+          <div style="background: rgba(16, 185, 129, 0.12); border: 1.5px solid #10b981; border-radius: 12px; padding: 20px; text-align: center; animation: fadeIn 0.4s ease;">
+            <i class="fa-solid fa-circle-check" style="color: #10b981; font-size: 34px; margin-bottom: 10px; display: block;"></i>
+            <b style="color: #fff; font-size: 16px; display: block;">Emergency Incident ${id} Resolved!</b>
+            <p style="color: #94a3b8; font-size: 13px; margin: 6px 0 12px;">Patient handover complete. Location channel and navigation link have been closed automatically.</p>
+            <div style="background: #091326; border: 1px solid #1a2c4e; border-radius: 8px; padding: 10px; font-size: 12px; color: #38bdf8; font-family: 'JetBrains Mono';">
+              <i class="fa-solid fa-satellite-dish"></i> Location system reset • Terminal standing by for next call
+            </div>
+          </div>
+        `;
+
+        $("navActionArea").innerHTML = `
+          <div style="text-align: center; color: #64748b; font-size: 12px; padding: 12px; font-family: 'JetBrains Mono';">
+            <i class="fa-solid fa-shield-halved"></i> Terminal in standby mode. Location system will awaken automatically on-time when any new emergency report is received.
+          </div>
+        `;
+
+        const campusLat = 11.3562;
+        const campusLng = 77.8982;
+        const bbox = `${(campusLng - 0.01).toFixed(4)}%2C${(campusLat - 0.01).toFixed(4)}%2C${(campusLng + 0.01).toFixed(4)}%2C${(campusLat + 0.01).toFixed(4)}`;
+        $("mapIframe").src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${campusLat}%2C${campusLng}`;
+
+        selectedIncidentId = null;
+      }
+
+      // UPDATE STATUS
+      window.updateStatus = async function (id, nextStatus) {
+        try {
+          const res = await fetch(`/api/incidents/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              status: nextStatus,
+              eta: nextStatus === 'ACCEPTED' ? '3 to 5 mins' : ''
+            })
+          });
+          if (!res.ok) throw new Error("Status update failed");
+
+          if (nextStatus === 'RESOLVED') {
+            closeAmbulanceLocationForIncident(id);
+          }
+          await fetchIncidents();
+        } catch (e) {
+          alert("Error: " + e.message);
+        }
+      };
+
+      window.openLightbox = openLightbox;
+
+      function formatTime(iso) {
+        if (!iso) return "";
+        const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+        if (diff < 60) return "Just now";
+        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+        return `${Math.floor(diff / 3600)}h ago`;
+      }
+
+      function escapeHtml(str) {
+        return (str || "").replace(/[&<>"']/g, m => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[m]);
+      }
+
+      // REAL-TIME SSE
+      if (window.EventSource) {
+        const source = new EventSource("/api/stream");
+        source.addEventListener("incident:new", () => {
+          updateDriverLocation();
+          fetchIncidents();
+          playAmbulanceSiren();
+        });
+        source.addEventListener("incident:update", () => fetchIncidents());
+        source.addEventListener("incident:deleted", () => fetchIncidents());
+      }
+
+      // INITIAL CHECK AUTH & SYNC
+      checkDriverAuth();
+      updateDriverLocation();
+      setInterval(updateDriverLocation, 20000);
+      // INITIAL FETCH & CONTINUOUS SYNC
+      fetchIncidents();
+      setInterval(fetchIncidents, 2500);
+
+    })();
+  </script>
+
+
+  </div>
+  </div>
+  </div>
+
+</body>
+
+</html>

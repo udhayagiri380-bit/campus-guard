@@ -1,0 +1,19 @@
+{
+  "name": "ksr-campusguard",
+  "version": "1.0.0",
+  "description": "KSR Institutions - CampusGuard Emergency Response System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "emergency",
+    "campusguard",
+    "ksr"
+  ],
+  "author": "KSR Institutions",
+  "license": "ISC"
+}

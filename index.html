@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KSR Institutions Emergency Control Center — Campus Emergency Response Dashboard</title>
+  <meta name="description"
+    content="Mission-critical emergency response dashboard for KSR INSTITUTIONS (KSRCT, KSRCE, KSRCAS, KSR Dental). Real-time tactical campus map, live emergency alerts, fleet dispatch, response tracking, and mass notification system.">
+
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="theme-dark">
+  <!-- Strobe / Critical Flash Overlay -->
+  <div id="criticalFlashOverlay" class="critical-flash-overlay"></div>
+
+  <!-- Main Grid Container -->
+  <div class="app-layout">
+
+    <!-- Top System Header Bar -->
+    <header class="top-header" id="topHeader">
+      <div class="brand-group">
+        <div class="brand-badge">
+          <!-- KSR Crest / Insignia Badge -->
+          <div class="ksr-crest-icon" title="KSR INSTITUTIONS Emblem">
+            <svg viewBox="0 0 44 44" class="crest-svg" width="38" height="38">
+              <!-- Outer Shield with Gold Accent -->
+              <polygon points="22,2 40,8 40,24 22,42 4,24 4,8" fill="#0c1a32" stroke="#f59e0b" stroke-width="1.8" />
+              <!-- Inner Radiant Glow -->
+              <polygon points="22,6 36,11 36,23 22,37 8,23 8,11" fill="none" stroke="#00f0ff" stroke-width="0.8"
+                opacity="0.6" />
+              <!-- Torch of Knowledge & Flaming Stars -->
+              <path d="M 22,10 L 25,18 L 19,18 Z" fill="#f59e0b" />
+              <path d="M 22,7 C 23,9 24,11 22,13 C 20,11 21,9 22,7 Z" fill="#ef4444" />
+              <!-- Lion / Shield Heraldic Symbol -->
+              <circle cx="22" cy="24" r="5" fill="#f59e0b" />
+              <path d="M 16,30 Q 22,33 28,30" stroke="#f59e0b" stroke-width="1.5" fill="none" />
+              <text x="22" y="27" font-family="'Outfit', sans-serif" font-weight="900" font-size="6"
+                text-anchor="middle" fill="#0a192f">KSR</text>
+            </svg>
+            <span class="crest-live-ring"></span>
+          </div>
+
+          <div>
+            <div class="brand-title">
+              <span class="brand-name-primary">KSR INSTITUTIONS</span>
+              <span class="version-tag">EMERGENCY CONTROL CENTER</span>
+            </div>
+            <div class="brand-sub">
+              <span>CampusGuard Emergency SOS Portal</span>
+              <span class="sub-bullet">•</span>
+              <span class="sub-highlight">Campus Security & Disaster Management Directorate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center Threat Matrix Level -->
+      <div class="threat-status-pod" id="threatStatusPod">
+        <div class="threat-indicator-label">THREAT MATRIX:</div>
+        <div class="threat-level-badge level-amber" id="threatLevelBadge">
+          <span class="threat-dot"></span>
+          <span id="threatLevelText">CONDITION AMBER (ELEVATED)</span>
+        </div>
+        <div class="threat-selector-menu">
+          <button class="defcon-btn btn-green" data-level="green"
+            title="Condition Normal / Baseline Green">NORMAL</button>
+          <button class="defcon-btn btn-amber active" data-level="amber"
+            title="Condition Amber / Elevated Response">AMBER</button>
+          <button class="defcon-btn btn-red" data-level="red"
+            title="Condition Red / Critical Emergency">CRITICAL</button>
+          <button class="defcon-btn btn-black" data-level="black"
+            title="Condition Black / Total Campus Lockdown">LOCKDOWN</button>
+        </div>
+      </div>
+
+      <!-- Right Telemetry & Action Buttons -->
+      <div class="header-right">
+        <!-- Prominent Report Emergency Primary Button -->
+        <button id="headerReportEmergencyBtn" class="hud-btn hud-btn-sos"
+          title="Submit Emergency Alert & Dispatch First Responders">
+          <i class="fa-solid fa-plus-circle pulse-icon"></i>
+          <span>REPORT EMERGENCY</span>
+        </button>
+
+        <!-- Live Clock & Network Status -->
+        <div class="live-clock-card">
+          <div class="time-readout" id="liveClockDisplay">21:12:45 IST (UTC+05:30)</div>
+          <div class="meta-readout">
+            <span class="status-indicator online"></span> KSR MESH ACTIVE | 64 NODES
+          </div>
+        </div>
+
+        <!-- Audio Sirens & Mute Toggle -->
+        <button id="toggleAudioBtn" class="hud-btn hud-btn-audio" title="Toggle Tactical Audio Feedback & Siren Alerts">
+          <i class="fa-solid fa-volume-high" id="audioIcon"></i>
+          <span id="audioStatusText">AUDIO ON</span>
+        </button>
+
+        <!-- Real-Time Simulation Cockpit Control Trigger -->
+        <button id="simCockpitBtn" class="hud-btn hud-btn-sim-cockpit"
+          title="Open Tactical Simulation Cockpit & Mock Scenario Engine">
+          <i class="fa-solid fa-gamepad"></i>
+          <span>SIM COCKPIT</span>
+          <span class="sim-pill-status" id="simHeaderStatus">RUNNING</span>
+        </button>
+
+        <!-- Simulation Drills Dropdown -->
+        <div class="drill-dropdown-wrap">
+          <button id="drillTriggerBtn" class="hud-btn hud-btn-drill">
+            <i class="fa-solid fa-bolt-lightning"></i>
+            <span>DRILL SIM</span>
+            <i class="fa-solid fa-chevron-down chevron-sm"></i>
+          </button>
+          <div class="drill-menu" id="drillMenu">
+            <div class="menu-heading">KSR CRISIS SIMULATION DRILLS</div>
+            <button class="drill-item" data-drill="fire_block_b"><i class="fa-solid fa-fire-flame-curved"
+                style="color: #ef4444;"></i> Fire in Block B (KSRCE Engineering)</button>
+            <button class="drill-item" data-drill="medical_library"><i class="fa-solid fa-truck-medical"
+                style="color: #06b6d4;"></i> Medical Emergency in Library</button>
+            <button class="drill-item" data-drill="hazmat"><i class="fa-solid fa-biohazard"></i> Chem Vapor Anomaly
+              (KSRCAS BioTech)</button>
+            <button class="drill-item" data-drill="lockdown"><i class="fa-solid fa-door-closed"></i> Gate 1 Perimeter
+              Security Breach</button>
+            <button class="drill-item" data-drill="substation"><i class="fa-solid fa-bolt"></i> 110kV Substation Power
+              Arc</button>
+            <button class="drill-item" data-drill="tornado"><i class="fa-solid fa-cloud-bolt"></i> Monsoon Thunderstorm
+              Doppler</button>
+            <div class="menu-divider"></div>
+            <button class="drill-item" id="openCockpitFromMenu"><i class="fa-solid fa-sliders"></i> Open Full Simulation
+              Cockpit...</button>
+            <button class="drill-item drill-reset" data-drill="reset"><i class="fa-solid fa-rotate-left"></i> Reset
+              Baseline (Condition Green)</button>
+          </div>
+        </div>
+
+        <!-- Fullscreen Toggle -->
+        <button id="fullscreenBtn" class="hud-btn hud-icon-only" title="Toggle Command Center Fullscreen">
+          <i class="fa-solid fa-expand"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Campus Helpline Emergency Hotline Ticker -->
+    <div class="campus-helpline-ticker">
+      <div class="helpline-label"><i class="fa-solid fa-phone-volume"></i> KSR EMERGENCY HOTLINES:</div>
+      <div class="helpline-scroll-track">
+        <span class="hl-item"><strong>CAMPUS SOS (INTERNAL):</strong> Ext. 2222 / 9999</span>
+        <span class="hl-divider">•</span>
+        <span class="hl-item"><strong>CHIEF SECURITY OFFICER:</strong> +91 94433 12345</span>
+        <span class="hl-divider">•</span>
+        <span class="hl-item"><strong>KSR HEALTH CENTRE & AMBULANCE:</strong> +91 94433 54321 / 108</span>
+        <span class="hl-divider">•</span>
+        <span class="hl-item"><strong>KSR FIRE DISASTER UNIT:</strong> Ext. 1010</span>
+        <span class="hl-divider">•</span>
+        <span class="hl-item"><strong>HOSTEL CHIEF WARDEN:</strong> +91 94433 67890</span>
+        <span class="hl-divider">•</span>
+        <span class="hl-item"><strong>NATIONAL POLICE & RESCUE:</strong> 112 / 100</span>
+      </div>
+      <div class="helpline-tag-badge">ESTD 1984 | TIRUCHENGODE</div>
+    </div>
+
+    <!-- Global Emergency Action Banner (Dynamic Alert Bar) -->
+    <section class="broadcast-alert-banner" id="globalAlertBanner">
+      <div class="banner-content">
+        <div class="beacon-pulse">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="banner-text">
+          <strong id="bannerTitle">ACTIVE ALERT #842:</strong>
+          <span id="bannerBody">Chemical containment valve anomaly in KSRCAS BioTech Wing (3rd Floor Lab). Evacuation
+            perimeter established. QRT Alpha & Fire Tender on scene.</span>
+        </div>
+      </div>
+      <div class="banner-actions">
+        <button class="banner-btn" id="bannerQuickBroadcastBtn">
+          <i class="fa-solid fa-bullhorn"></i> PUSH EAS ALERT
+        </button>
+        <button class="banner-btn banner-btn-outline" id="bannerInspectBtn">
+          <i class="fa-solid fa-crosshairs"></i> FOCUS ON MAP
+        </button>
+        <button class="banner-close-btn" id="dismissBannerBtn" title="Dismiss Alert Bar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- Real-Time Floating Emergency Alert Popup -->
+    <aside class="live-emergency-popup" id="liveAlertPopup" style="display: none;" role="alert" aria-live="assertive">
+      <div class="popup-beacon-ring">
+        <i class="fa-solid fa-triangle-exclamation" id="popupAlertIcon"></i>
+      </div>
+      <div class="popup-content">
+        <div class="popup-topline">
+          <span class="popup-tag" id="popupSeverityTag">CRITICAL ALERT</span>
+          <span class="popup-time" id="popupTimestamp">JUST NOW</span>
+          <span class="popup-code" id="popupCode">#EMG-902</span>
+        </div>
+        <h4 class="popup-title" id="popupTitle">Fire Alarm in Block B Lab 204</h4>
+        <p class="popup-desc" id="popupDesc">Multiple smoke & thermal sensors triggered. Suppression flow engaged.
+          Evacuation underway.</p>
+        <div class="popup-meta-row">
+          <span class="meta-item"><i class="fa-solid fa-location-dot"></i> <strong id="popupLocation">Block B
+              (KSRCE)</strong></span>
+          <span class="meta-item"><i class="fa-solid fa-shield-halved"></i> <strong id="popupUnits">Fire Tender 01, QRT
+              Alpha</strong></span>
+        </div>
+        <div class="popup-actions">
+          <button class="popup-btn primary" id="popupActionTrack"><i class="fa-solid fa-crosshairs"></i> FOCUS ON
+            MAP</button>
+          <button class="popup-btn warning" id="popupActionEvac"><i
+              class="fa-solid fa-person-walking-dashed-line-arrow-right"></i> EVACUATE ZONE</button>
+          <button class="popup-btn outline" id="popupActionDismiss"><i class="fa-solid fa-check"></i>
+            ACKNOWLEDGE</button>
+        </div>
+      </div>
+      <button class="popup-close-x" id="popupCloseBtn" title="Dismiss Alert Popup"><i
+          class="fa-solid fa-xmark"></i></button>
+    </aside>
+
+    <!-- Master Layout 3-Column Command Grid -->
+    <main class="dashboard-body">
+
+      <!-- LEFT COLUMN: Incident Triage, Response Tracking, History & Sensors -->
+      <aside class="dashboard-sidebar-left" id="sidebarLeft">
+
+        <!-- Quick Emergency Action Bar -->
+        <div class="panel quick-action-matrix">
+          <div class="panel-header compact">
+            <span class="panel-title"><i class="fa-solid fa-bolt"></i> RAPID INTERVENTION</span>
+            <span class="live-pill red"><i class="fa-solid fa-circle"></i> READY</span>
+          </div>
+          <div class="action-grid-buttons">
+            <button class="action-tile-btn danger" id="triggerLockdownModalBtn">
+              <i class="fa-solid fa-lock"></i>
+              <span class="tile-title">CAMPUS LOCKDOWN</span>
+              <span class="tile-sub">All Gates & Magnetic Doors</span>
+            </button>
+            <button class="action-tile-btn warning" id="openBroadcastModalBtn">
+              <i class="fa-solid fa-tower-broadcast"></i>
+              <span class="tile-title">EAS BROADCAST</span>
+              <span class="tile-sub">SMS, Sirens, Digital Displays</span>
+            </button>
+            <button class="action-tile-btn primary highlight-btn" id="openNewIncidentModalBtn">
+              <i class="fa-solid fa-circle-plus"></i>
+              <span class="tile-title">REPORT EMERGENCY</span>
+              <span class="tile-sub">Log New Call & Dispatch</span>
+            </button>
+            <button class="action-tile-btn info" id="evacuateZoneModalBtn">
+              <i class="fa-solid fa-person-walking-dashed-line-arrow-right"></i>
+              <span class="tile-title">ZONE EVACUATION</span>
+              <span class="tile-sub">Muster Corridors & Strobe</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabbed Panel: ACTIVE INCIDENTS vs INCIDENT HISTORY -->
+        <div class="panel panel-incident-triage">
+          <div class="panel-header">
+            <!-- Mode Switcher Tabs: Active vs History -->
+            <div class="incident-mode-tabs">
+              <button class="mode-tab active" id="tabActiveIncidents" data-mode="active">
+                <i class="fa-solid fa-bell-exclamation"></i>
+                <span>ACTIVE</span>
+                <span class="tab-badge-count red" id="activeIncidentCount">3</span>
+              </button>
+              <button class="mode-tab" id="tabIncidentHistory" data-mode="history">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>HISTORY</span>
+                <span class="tab-badge-count" id="historyIncidentCount">14</span>
+              </button>
+            </div>
+
+            <!-- Quick Category Filter Pills -->
+            <div class="panel-tabs" id="incidentFilterGroup">
+              <button class="filter-tab active" data-filter="all">ALL</button>
+              <button class="filter-tab" data-filter="critical">CRIT</button>
+              <button class="filter-tab" data-filter="medical">MED</button>
+              <button class="filter-tab" data-filter="security">SEC</button>
+            </div>
+          </div>
+
+          <!-- Active Incidents View -->
+          <div class="incident-view-wrapper active-view" id="activeIncidentsView">
+            <div class="incident-list-container" id="incidentListContainer">
+              <!-- Dynamically populated via JS -->
+            </div>
+          </div>
+
+          <!-- Incident History View (Hidden by default, switched via tab) -->
+          <div class="incident-view-wrapper history-view" id="incidentHistoryView" style="display: none;">
+            <div class="history-controls-bar">
+              <div class="history-search-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="historySearchInput" placeholder="Search past incidents, zones, units...">
+              </div>
+              <button class="export-report-btn" id="exportHistoryReportBtn"
+                title="Download Formatted After-Action Report">
+                <i class="fa-solid fa-file-arrow-down"></i> EXPORT
+              </button>
+            </div>
+            <div class="history-list-container" id="historyListContainer">
+              <!-- Dynamically populated past incident records -->
+            </div>
+          </div>
+
+          <!-- Bottom Incident Ticker Status -->
+          <div class="panel-footer-stat">
+            <div class="mini-stat">
+              <span class="lbl">AVG DISPATCH RESPONSE</span>
+              <span class="val green"><i class="fa-solid fa-stopwatch"></i> 1m 28s</span>
+            </div>
+            <div class="mini-stat">
+              <span class="lbl">24H RESOLUTION RATE</span>
+              <span class="val" id="resolvedCountDisplay">14 RESOLVED</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⏱️ DEDICATED RESPONSE TRACKING & SLA CHRONOMETER PANEL -->
+        <div class="panel panel-response-tracking" id="responseTrackingPanel">
+          <div class="panel-header compact">
+            <span class="panel-title"><i class="fa-solid fa-stopwatch-20"></i> LIVE RESPONSE TRACKING & SLA</span>
+            <span class="live-pill amber" id="trackingStatusTag"><i class="fa-solid fa-circle"></i> TRACKING
+              ACTIVE</span>
+          </div>
+
+          <div class="tracking-body">
+            <!-- Active Selected Incident Header -->
+            <div class="tracking-incident-meta">
+              <div class="track-id-badge" id="trackingIncId">INCIDENT #842</div>
+              <div class="track-title" id="trackingIncTitle">Hazardous Chemical Vapor Anomaly</div>
+              <div class="track-location" id="trackingIncLocation"><i class="fa-solid fa-location-dot"></i> KSRCAS
+                BioTech Wing (Lab 3B)</div>
+            </div>
+
+            <!-- Live Elapsed Chronometer Display -->
+            <div class="chronometer-card">
+              <div class="chrono-label">ELAPSED ON-SCENE CHRONOMETER</div>
+              <div class="chrono-timer-row">
+                <span class="chrono-digits" id="liveChronometerDisplay">04:18</span>
+                <span class="chrono-sla-tag on-track" id="slaTargetBadge">SLA TARGET: &lt; 05:00 MIN</span>
+              </div>
+              <!-- Visual SLA Target Fill Bar -->
+              <div class="sla-progress-track">
+                <div class="sla-progress-bar" id="slaProgressBar" style="width: 86%;"></div>
+              </div>
+            </div>
+
+            <!-- 5-Stage Incident Lifecycle Pipeline Tracker -->
+            <div class="lifecycle-pipeline-wrap">
+              <div class="pipeline-title">INCIDENT LIFECYCLE PROGRESSION:</div>
+              <div class="pipeline-steps-container" id="pipelineStepsContainer">
+                <div class="pipeline-step completed" data-step="1">
+                  <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+                  <span class="step-name">1. REPORTED</span>
+                </div>
+                <div class="pipeline-connector active"></div>
+                <div class="pipeline-step completed" data-step="2">
+                  <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+                  <span class="step-name">2. DISPATCHED</span>
+                </div>
+                <div class="pipeline-connector active"></div>
+                <div class="pipeline-step current" data-step="3">
+                  <div class="step-circle"><i class="fa-solid fa-location-crosshairs"></i></div>
+                  <span class="step-name">3. ON SCENE</span>
+                </div>
+                <div class="pipeline-connector"></div>
+                <div class="pipeline-step" data-step="4">
+                  <div class="step-circle">4</div>
+                  <span class="step-name">4. CONTAINED</span>
+                </div>
+                <div class="pipeline-connector"></div>
+                <div class="pipeline-step" data-step="5">
+                  <div class="step-circle">5</div>
+                  <span class="step-name">5. RESOLVED</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Status Advance Actions -->
+            <div class="tracking-action-row">
+              <button class="btn-advance-stage" id="advanceStageBtn" title="Advance Incident to Next Lifecycle Stage">
+                <i class="fa-solid fa-forward-step"></i> ADVANCE TO NEXT STAGE
+              </button>
+              <button class="btn-quick-resolve" id="quickResolveBtn" title="Mark Incident as Fully Resolved">
+                <i class="fa-solid fa-circle-check"></i> RESOLVE
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Facility Access & Sensor Mesh Telemetry -->
+        <div class="panel panel-telemetry">
+          <div class="panel-header compact">
+            <span class="panel-title"><i class="fa-solid fa-microchip"></i> KSR IOT SENSOR MESH</span>
+            <button class="refresh-sub-btn" id="refreshSensorsBtn" title="Sync Mesh Nodes">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+          </div>
+
+          <div class="telemetry-grid">
+            <div class="sensor-card">
+              <div class="sensor-title"><i class="fa-solid fa-wind"></i> BIO-LAB AIR VOC</div>
+              <div class="sensor-gauge">
+                <div class="gauge-bar">
+                  <div class="gauge-fill warning" style="width: 68%;"></div>
+                </div>
+                <div class="sensor-value warning">68 PPM <span class="sensor-sub">(BioTech Lab 3B)</span></div>
+              </div>
+            </div>
+
+            <div class="sensor-card">
+              <div class="sensor-title"><i class="fa-solid fa-door-open"></i> PERIMETER PORTALS</div>
+              <div class="sensor-metric-row">
+                <span class="metric-tag locked"><i class="fa-solid fa-lock"></i> 148 SECURED</span>
+                <span class="metric-tag open"><i class="fa-solid fa-door-open"></i> Gate 1 Open</span>
+              </div>
+            </div>
+
+            <div class="sensor-card">
+              <div class="sensor-title"><i class="fa-solid fa-bolt"></i> 110KV SUBSTATION</div>
+              <div class="sensor-metric-row">
+                <span class="metric-tag ok"><i class="fa-solid fa-plug-circle-check"></i> TNEB FEED 100%</span>
+                <span class="metric-tag standby"><i class="fa-solid fa-battery-three-quarters"></i> 4x 750kVA
+                  DIESEL</span>
+              </div>
+            </div>
+
+            <div class="sensor-card">
+              <div class="sensor-title"><i class="fa-solid fa-phone-volume"></i> BLUE LIGHT CALLBOXES</div>
+              <div class="sensor-metric-row">
+                <span class="metric-tag ok">48 ONLINE</span>
+                <span class="metric-tag pinging"><i class="fa-solid fa-signal"></i> 1 ACTIVE CALL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- CENTER COLUMN: Interactive Tactical Campus Map & Command HUD -->
+      <section class="dashboard-center" id="sectionCenter">
+
+        <!-- Map Canvas / Control Frame -->
+        <div class="tactical-map-viewport" id="mapViewport">
+
+          <!-- Map Overlay Top Bar -->
+          <div class="map-hud-top-bar">
+            <div class="map-heading-group">
+              <div class="hud-tag">KSR INSTITUTIONS GEOSPATIAL VECTOR GRID</div>
+              <div class="hud-coords">CAMPUS GPS: 11.3582° N, 77.9257° E | ELEV: 215M | TIRUCHENGODE</div>
+            </div>
+
+            <!-- Layer Controls -->
+            <div class="map-layer-toggles">
+              <label class="layer-pill active" data-layer="incidents">
+                <input type="checkbox" checked id="layerIncidents">
+                <span class="layer-dot red"></span> Incidents
+              </label>
+              <label class="layer-pill active" data-layer="responders">
+                <input type="checkbox" checked id="layerResponders">
+                <span class="layer-dot blue"></span> Response Units
+              </label>
+              <label class="layer-pill active" data-layer="callboxes">
+                <input type="checkbox" checked id="layerCallboxes">
+                <span class="layer-dot cyan"></span> Blue Callboxes
+              </label>
+              <label class="layer-pill active" data-layer="evacRoutes">
+                <input type="checkbox" checked id="layerEvacRoutes">
+                <span class="layer-dot green"></span> Evac Routes
+              </label>
+              <label class="layer-pill active" data-layer="cctv">
+                <input type="checkbox" checked id="layerCCTV">
+                <span class="layer-dot amber"></span> CCTV Cones
+              </label>
+            </div>
+
+            <!-- Zoom & View Tools -->
+            <div class="map-view-actions">
+              <button class="map-icon-btn" id="mapZoomInBtn" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+              <button class="map-icon-btn" id="mapZoomOutBtn" title="Zoom Out"><i
+                  class="fa-solid fa-minus"></i></button>
+              <button class="map-icon-btn" id="mapResetViewBtn" title="Recenter View"><i
+                  class="fa-solid fa-crosshairs"></i></button>
+              <button class="map-icon-btn" id="mapGridToggleBtn" title="Toggle Tactical Scan Grid"><i
+                  class="fa-solid fa-border-all"></i></button>
+            </div>
+          </div>
+
+          <!-- Dynamic SVG Vector Map Surface -->
+          <div class="svg-map-wrapper" id="svgMapWrapper">
+            <svg id="campusSvgMap" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <!-- Background Grid Pattern -->
+                <pattern id="tacticalGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(56, 189, 248, 0.07)" stroke-width="1" />
+                  <circle cx="0" cy="0" r="1.5" fill="rgba(56, 189, 248, 0.2)" />
+                </pattern>
+
+                <!-- High-tech Radial Gradients -->
+                <radialGradient id="dangerZoneGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="rgba(239, 68, 68, 0.65)" />
+                  <stop offset="60%" stop-color="rgba(239, 68, 68, 0.25)" />
+                  <stop offset="100%" stop-color="rgba(239, 68, 68, 0)" />
+                </radialGradient>
+
+                <radialGradient id="safeZoneGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="rgba(16, 185, 129, 0.55)" />
+                  <stop offset="70%" stop-color="rgba(16, 185, 129, 0.15)" />
+                  <stop offset="100%" stop-color="rgba(16, 185, 129, 0)" />
+                </radialGradient>
+
+                <!-- Glow Filter -->
+                <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- Map Background & Perimeter Ground -->
+              <rect width="1200" height="800" fill="#080c14" />
+              <rect width="1200" height="800" fill="url(#tacticalGrid)" />
+
+              <!-- Outer Boundary & KSR Kalvi Nagar Campus Perimeter (300+ Acres) -->
+              <path class="campus-boundary" d="M 120 70 L 1080 70 L 1120 420 L 1020 740 L 180 740 L 80 440 Z" />
+
+              <!-- Campus Green Lawns & Courtyards -->
+              <polygon class="lawn-zone" points="400,280 620,280 600,460 380,460" />
+              <polygon class="lawn-zone" points="740,340 920,340 900,520 720,520" />
+              <polygon class="lawn-zone" points="200,160 340,160 320,320 180,320" />
+
+              <!-- Roads & Walkways Network -->
+              <g class="road-network">
+                <!-- Perimeter Ring Road -->
+                <path class="perimeter-road" d="M 140 90 L 1060 90 L 1090 420 L 1000 710 L 200 710 L 110 430 Z" />
+
+                <!-- Main Interlocking Arterials -->
+                <path class="campus-arterial" d="M 600 90 L 600 710" />
+                <path class="campus-arterial" d="M 140 380 L 1060 380" />
+                <path class="campus-arterial" d="M 360 90 L 360 710" />
+                <path class="campus-arterial" d="M 840 90 L 840 710" />
+
+                <!-- Pedestrian Walkways -->
+                <path class="walkway-line" d="M 360 200 L 600 380 L 840 560" />
+                <path class="walkway-line" d="M 840 200 L 600 380 L 360 560" />
+              </g>
+
+              <!-- Evacuation Corridors (Glowing Animated Lines) -->
+              <g id="evacuationRoutesGroup" class="layer-group">
+                <path class="evac-route-anim" d="M 460 260 L 460 120 L 240 120" />
+                <path class="evac-route-anim" d="M 520 260 L 600 200 L 600 90" />
+                <path class="evac-route-anim" d="M 760 300 L 840 380 L 1050 380" />
+                <path class="evac-route-anim" d="M 600 540 L 600 680 L 740 680" />
+
+                <!-- Safe Assembly Muster Point Markers -->
+                <g class="muster-station" transform="translate(240, 110)">
+                  <circle r="22" fill="url(#safeZoneGlow)" />
+                  <circle r="12" class="muster-center-pulse" />
+                  <text y="4" text-anchor="middle" class="muster-label">M1</text>
+                  <text y="28" text-anchor="middle" class="muster-title">ATHLETIC STADIUM</text>
+                </g>
+
+                <g class="muster-station" transform="translate(1040, 380)">
+                  <circle r="22" fill="url(#safeZoneGlow)" />
+                  <circle r="12" class="muster-center-pulse" />
+                  <text y="4" text-anchor="middle" class="muster-label">M2</text>
+                  <text y="28" text-anchor="middle" class="muster-title">CENTRAL QUAD LAWN</text>
+                </g>
+
+                <g class="muster-station" transform="translate(740, 690)">
+                  <circle r="22" fill="url(#safeZoneGlow)" />
+                  <circle r="12" class="muster-center-pulse" />
+                  <text y="4" text-anchor="middle" class="muster-label">M3</text>
+                  <text y="28" text-anchor="middle" class="muster-title">AUDITORIUM PLAZA</text>
+                </g>
+              </g>
+
+              <!-- Dynamic Hazard Perimeter (Lab Hazmat Radius at KSRCAS BioTech) -->
+              <g id="dangerPerimeterGroup" class="layer-group">
+                <circle cx="490" cy="220" r="85" class="danger-radius-ring" />
+                <circle cx="490" cy="220" r="85" fill="url(#dangerZoneGlow)" />
+                <text x="490" y="125" text-anchor="middle" class="danger-zone-tag">CORDON: 150M BIO-CHEM ISOLATION
+                  ZONE</text>
+              </g>
+
+              <!-- KSR Campus Buildings Group (Interactive 3D Isometric Polygons) -->
+              <g id="buildingsGroup" class="buildings-layer">
+
+                <!-- 1. KSRCAS Arts & Science & BioTech Complex (Active Chemical Hazard) -->
+                <g class="building-node has-hazard" id="bld-ksrcas" data-id="ksrcas"
+                  data-name="KSRCAS Arts & Science College (BioTech Wing)" data-haz="Chem Leak Lab 3B"
+                  data-occ="540 / 900" data-status="CRITICAL">
+                  <polygon points="420,180 560,180 580,260 440,260" class="building-roof" />
+                  <polygon points="420,180 440,260 440,272 420,192" class="building-shadow" />
+                  <polygon points="440,260 580,260 580,272 440,272" class="building-facade" />
+                  <text x="500" y="225" class="bld-code">KSRCAS BIOTECH</text>
+                  <circle cx="500" cy="200" r="16" class="pulsing-hazard-circle" />
+                  <circle cx="500" cy="200" r="6" fill="#ef4444" />
+                </g>
+
+                <!-- 2. Central Digital Library & Research Center -->
+                <g class="building-node" id="bld-library" data-id="library"
+                  data-name="Central Digital Library & Research Center" data-occ="840 / 1200" data-status="NORMAL">
+                  <polygon points="520,320 680,320 680,430 520,430" class="building-roof" />
+                  <polygon points="520,430 680,430 680,442 520,442" class="building-facade" />
+                  <text x="600" y="380" class="bld-code">CENTRAL LIBRARY</text>
+                </g>
+
+                <!-- 3. Central Food Court & Student Amenities -->
+                <g class="building-node" id="bld-foodcourt" data-id="foodcourt"
+                  data-name="Central Food Court & Amenities Mall" data-occ="620 / 800" data-status="NORMAL">
+                  <polygon points="370,340 480,340 490,430 360,430" class="building-roof" />
+                  <polygon points="360,430 490,430 490,440 360,440" class="building-facade" />
+                  <text x="425" y="390" class="bld-code">FOOD COURT</text>
+                </g>
+
+                <!-- 4. KSRCT Tech Complex (Mechanical, EEE, ECE, CSE, IT Blocks) -->
+                <g class="building-node" id="bld-ksrct" data-id="ksrct"
+                  data-name="KSRCT Main Technical Complex (Mech, CSE, IT)" data-occ="1,240 / 1800" data-status="NORMAL">
+                  <polygon points="630,170 780,170 770,260 620,260" class="building-roof" />
+                  <polygon points="620,260 770,260 770,270 620,270" class="building-facade" />
+                  <text x="700" y="220" class="bld-code">KSRCT TECH MAIN</text>
+                </g>
+
+                <!-- 5. KSR Dental College & Research Hospital (Emergency Bay) -->
+                <g class="building-node" id="bld-dental" data-id="dental"
+                  data-name="KSR Dental College & Hospital (24/7 Trauma Bay)" data-occ="140 / 250"
+                  data-status="DISPATCHING">
+                  <polygon points="840,210 980,210 970,310 830,310" class="building-roof" />
+                  <polygon points="830,310 970,310 970,320 830,320" class="building-facade" />
+                  <text x="905" y="265" class="bld-code">KSR DENTAL HOSP</text>
+                  <circle cx="905" cy="245" r="4" fill="#3b82f6" />
+                </g>
+
+                <!-- 6. KSR Hostels Cluster (Bharathi, Tagore & Mother Teresa Towers) -->
+                <g class="building-node has-warning" id="bld-hostels" data-id="hostels"
+                  data-name="KSR Hostels Cluster (Bharathi & Tagore Blocks)" data-occ="1,850 / 2200"
+                  data-status="WARNING">
+                  <polygon points="760,430 940,430 930,550 750,550" class="building-roof" />
+                  <polygon points="750,550 930,550 930,562 750,562" class="building-facade" />
+                  <text x="845" y="495" class="bld-code">KSR HOSTEL RESIDENCE</text>
+                  <circle cx="845" cy="470" r="14" class="pulsing-warning-circle" />
+                  <circle cx="845" cy="470" r="5" fill="#f59e0b" />
+                </g>
+
+                <!-- 7. Athletics Pavilion, Stadium & Synthetic Track -->
+                <g class="building-node" id="bld-sports" data-id="sports"
+                  data-name="Athletics Stadium, Olympic Track & Cricket Oval" data-occ="420 / 3000"
+                  data-status="NORMAL">
+                  <polygon points="350,530 540,530 520,680 330,680" class="building-roof" />
+                  <polygon points="330,680 520,680 520,692 330,692" class="building-facade" />
+                  <text x="435" y="610" class="bld-code">ATHLETICS STADIUM</text>
+                </g>
+
+                <!-- 8. Dr. K.S. Rangasamy Centenary Admin & Command Center -->
+                <g class="building-node" id="bld-admin" data-id="admin"
+                  data-name="Dr. K.S. Rangasamy Centenary Admin & Command Center" data-occ="85 / 120"
+                  data-status="NORMAL">
+                  <polygon points="210,380 310,380 310,480 210,480" class="building-roof" />
+                  <polygon points="210,480 310,480 310,490 210,490" class="building-facade" />
+                  <text x="260" y="435" class="bld-code">ADMIN COMMAND HQ</text>
+                </g>
+
+                <!-- 9. Main Entrance Highway Gate 1 Checkpoint -->
+                <g class="building-node" id="bld-gate1" data-id="gate1"
+                  data-name="Main Highway Entrance Gate 1 & Security Toll" data-occ="Security Squad"
+                  data-status="NORMAL">
+                  <polygon points="220,210 330,210 330,300 220,300" class="building-roof" />
+                  <text x="275" y="260" class="bld-code">GATE 1 CHECKPOINT</text>
+                </g>
+
+                <!-- 10. KSRCE Engineering Block -->
+                <g class="building-node" id="bld-ksrce" data-id="ksrce" data-name="KSRCE Engineering & Research Annex"
+                  data-occ="680 / 950" data-status="NORMAL">
+                  <polygon points="620,460 720,460 720,530 620,530" class="building-roof" />
+                  <text x="670" y="495" class="bld-code">KSRCE BLOCK</text>
+                </g>
+
+                <!-- 11. Dr. K.S. Rangasamy Kalvi Arangam (Auditorium) -->
+                <g class="building-node" id="bld-auditorium" data-id="auditorium"
+                  data-name="Dr. K.S. Rangasamy Kalvi Arangam A/C Mega Auditorium" data-occ="2,400 Cap"
+                  data-status="NORMAL">
+                  <polygon points="210,510 310,510 300,600 200,600" class="building-roof" />
+                  <text x="255" y="555" class="bld-code">KALVI ARANGAM</text>
+                </g>
+              </g>
+
+              <!-- CCTV Camera View Cones Layer -->
+              <g id="cctvConesGroup" class="layer-group">
+                <!-- CCTV 1: KSRCAS Quad -->
+                <g class="cctv-marker" transform="translate(430, 270)" data-cam="cam-1"
+                  data-name="CAM-01 KSRCAS BioTech Quad">
+                  <path d="M 0 0 L -40 80 A 60 60 0 0 0 40 80 Z" class="camera-vision-cone" />
+                  <circle r="6" class="camera-lens" />
+                  <text y="-8" text-anchor="middle" class="cam-text">CAM-01</text>
+                </g>
+                <!-- CCTV 2: KSR Hostels Entrance -->
+                <g class="cctv-marker" transform="translate(770, 420)" data-cam="cam-2"
+                  data-name="CAM-02 Bharathi Hostel Arch">
+                  <path d="M 0 0 L 70 -30 A 60 60 0 0 1 70 30 Z" class="camera-vision-cone" />
+                  <circle r="6" class="camera-lens" />
+                  <text y="-8" text-anchor="middle" class="cam-text">CAM-02</text>
+                </g>
+                <!-- CCTV 3: Athletics Stadium -->
+                <g class="cctv-marker" transform="translate(530, 540)" data-cam="cam-3"
+                  data-name="CAM-03 Athletics Stadium Plaza">
+                  <path d="M 0 0 L -50 60 A 50 50 0 0 0 20 70 Z" class="camera-vision-cone" />
+                  <circle r="6" class="camera-lens" />
+                  <text y="-8" text-anchor="middle" class="cam-text">CAM-03</text>
+                </g>
+              </g>
+
+              <!-- Blue Light Emergency Callboxes Layer -->
+              <g id="callboxesGroup" class="layer-group">
+                <g class="callbox-node" transform="translate(360, 200)" data-id="cb-01"
+                  data-name="Callbox #01 Gate 1 North Walk">
+                  <circle r="8" class="cb-pulse" />
+                  <circle r="4" fill="#06b6d4" />
+                </g>
+                <g class="callbox-node active-call" transform="translate(680, 580)" data-id="cb-14"
+                  data-name="Callbox #14 Stadium / Hostels (ACTIVE CALL)">
+                  <circle r="18" class="cb-alert-wave" />
+                  <circle r="6" fill="#f59e0b" />
+                  <text x="0" y="-12" text-anchor="middle" class="cb-alert-label">CALLBOX #14 PUSHED</text>
+                </g>
+                <g class="callbox-node" transform="translate(840, 200)" data-id="cb-09"
+                  data-name="Callbox #09 Dental Bay Courtyard">
+                  <circle r="8" class="cb-pulse" />
+                  <circle r="4" fill="#06b6d4" />
+                </g>
+                <g class="callbox-node" transform="translate(260, 510)" data-id="cb-04"
+                  data-name="Callbox #04 Admin Plaza">
+                  <circle r="8" class="cb-pulse" />
+                  <circle r="4" fill="#06b6d4" />
+                </g>
+              </g>
+
+              <!-- Real-Time Field Responders Units Layer -->
+              <g id="respondersGroup" class="layer-group">
+
+                <!-- QRT Alpha Patrol (Cruiser) -->
+                <g class="responder-marker" id="unit-patrol-01" transform="translate(470, 310)"
+                  data-unit="KSR QRT Alpha (Patrol Cruiser)" data-status="ON SCENE">
+                  <rect x="-14" y="-14" width="28" height="28" rx="6" class="unit-bg police" />
+                  <text x="0" y="4" text-anchor="middle" class="unit-icon-text">QRT</text>
+                  <text x="0" y="24" text-anchor="middle" class="unit-label">QRT ALPHA</text>
+                </g>
+
+                <!-- Fire Tender Unit 01 -->
+                <g class="responder-marker" id="unit-hazmat-01" transform="translate(420, 150)"
+                  data-unit="KSR Fire Tender 01" data-status="CORDONING">
+                  <rect x="-14" y="-14" width="28" height="28" rx="6" class="unit-bg hazmat" />
+                  <text x="0" y="4" text-anchor="middle" class="unit-icon-text">FT</text>
+                  <text x="0" y="24" text-anchor="middle" class="unit-label">FIRE UNIT 1</text>
+                </g>
+
+                <!-- Health Centre Ambulance 01 -->
+                <g class="responder-marker" id="unit-ems-02" transform="translate(640, 600)"
+                  data-unit="KSR Health Centre Ambulance 01" data-status="EN ROUTE">
+                  <rect x="-14" y="-14" width="28" height="28" rx="6" class="unit-bg medical" />
+                  <text x="0" y="4" text-anchor="middle" class="unit-icon-text">AMB</text>
+                  <text x="0" y="24" text-anchor="middle" class="unit-label">AMBULANCE 1</text>
+                </g>
+
+                <!-- Autonomous KSR SkyGuard Drone -->
+                <g class="responder-marker drone-marker" id="unit-drone-01" transform="translate(600, 240)"
+                  data-unit="KSR SkyGuard UAV (Patrol Drone)" data-status="AIRBORNE 45M">
+                  <circle r="14" class="drone-ring" />
+                  <polygon points="0,-10 8,8 -8,8" fill="#8b5cf6" />
+                  <text x="0" y="24" text-anchor="middle" class="drone-label">SKYGUARD UAV (45m)</text>
+                </g>
+
+                <!-- Bike Patrol Squad 03 -->
+                <g class="responder-marker" id="unit-bike-03" transform="translate(290, 310)"
+                  data-unit="KSR Bike Patrol Squad 03" data-status="AVAILABLE">
+                  <rect x="-14" y="-14" width="28" height="28" rx="6" class="unit-bg police" />
+                  <text x="0" y="4" text-anchor="middle" class="unit-icon-text">BP</text>
+                  <text x="0" y="24" text-anchor="middle" class="unit-label">BIKE SQUAD</text>
+                </g>
+
+                <!-- Disaster Electrical Squad -->
+                <g class="responder-marker" id="unit-elec-01" transform="translate(350, 470)"
+                  data-unit="Disaster Electrical Squad" data-status="STANDBY">
+                  <rect x="-14" y="-14" width="28" height="28" rx="6" class="unit-bg hazmat" />
+                  <text x="0" y="4" text-anchor="middle" class="unit-icon-text">DES</text>
+                  <text x="0" y="24" text-anchor="middle" class="unit-label">ELEC SQUAD</text>
+                </g>
+              </g>
+
+              <!-- Dynamic Evacuation Flow Particles Layer -->
+              <g id="evacParticlesGroup" class="layer-group">
+                <!-- Dynamically populated animated dots moving towards muster zones -->
+              </g>
+
+              <!-- Dynamic Hover Tooltip Anchor -->
+              <g id="mapTooltipGroup" class="map-tooltip-group" style="display: none;">
+                <rect class="tooltip-box" rx="6" width="220" height="70" />
+                <text x="12" y="20" class="tooltip-title">Building Title</text>
+                <text x="12" y="38" class="tooltip-detail">Status: Normal</text>
+                <text x="12" y="54" class="tooltip-detail-sub">Occupancy: 840</text>
+              </g>
+            </svg>
+          </div>
+
+          <!-- Bottom Floating Map Bar: Fast Quick Actions & Map Legend -->
+          <div class="map-hud-bottom-bar">
+            <div class="map-legend">
+              <span class="legend-item"><span class="legend-swatch critical"></span> Critical Hazard</span>
+              <span class="legend-item"><span class="legend-swatch warning"></span> Caution / Warning</span>
+              <span class="legend-item"><span class="legend-swatch responder"></span> Responder Fleet</span>
+              <span class="legend-item"><span class="legend-swatch evac"></span> Evacuation Route</span>
+              <span class="legend-item"><span class="legend-swatch muster"></span> Safe Muster Point</span>
+            </div>
+
+            <div class="map-status-actions">
+              <span class="hud-pill"><i class="fa-solid fa-satellite-dish"></i> SKYGUARD DRONE: ACTIVE</span>
+              <button class="map-action-pill" id="centerOnHazardBtn">
+                <i class="fa-solid fa-triangle-exclamation"></i> FOCUS ACTIVE HAZARD
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lower Section: Tactical Surveillance CCTV Matrix & Drone Telemetry -->
+        <div class="cctv-and-feed-dock">
+
+          <!-- CCTV Feeds Multi-View -->
+          <div class="panel cctv-matrix-panel">
+            <div class="panel-header compact">
+              <span class="panel-title"><i class="fa-solid fa-video"></i> KSR SURVEILLANCE & SKYGUARD RECON</span>
+              <div class="cctv-controls">
+                <button class="cam-mode-btn active" data-mode="normal" id="cctvNormalMode">OPTICAL</button>
+                <button class="cam-mode-btn" data-mode="thermal" id="cctvThermalMode">THERMAL</button>
+                <button class="cam-mode-btn" data-mode="night" id="cctvNightMode">IR NIGHT</button>
+              </div>
+            </div>
+
+            <div class="cctv-viewport-grid">
+
+              <!-- Feed 1: KSRCAS Quad / BioTech Wing -->
+              <div class="cctv-monitor active-mon" id="monChemLab">
+                <div class="cctv-header-overlay">
+                  <span class="cam-id-tag"><i class="fa-solid fa-circle red-blink"></i> CAM-01 KSRCAS BIOTECH (N)</span>
+                  <span class="cam-fps-tag">30 FPS | 4K UHD</span>
+                </div>
+                <div class="cctv-screen-render cam-feed-chem">
+                  <div class="crosshair-center"></div>
+                  <div class="bounding-box hazard-box">
+                    <span class="box-label">HAZMAT PERIMETER CORDON</span>
+                  </div>
+                  <div class="cctv-scanline"></div>
+                </div>
+                <div class="cctv-footer-overlay">
+                  <span>MOTION DETECT: POSITIVE</span>
+                  <span>TEMP: 26.2°C</span>
+                </div>
+              </div>
+
+              <!-- Feed 2: KSR Hostels Gate Arch -->
+              <div class="cctv-monitor" id="monEastDorm">
+                <div class="cctv-header-overlay">
+                  <span class="cam-id-tag"><i class="fa-solid fa-circle red-blink"></i> CAM-02 BHARATHI HOSTEL
+                    ARCH</span>
+                  <span class="cam-fps-tag">30 FPS</span>
+                </div>
+                <div class="cctv-screen-render cam-feed-dorm">
+                  <div class="crosshair-center"></div>
+                  <div class="bounding-box warning-box">
+                    <span class="box-label">AUX GATE AJAR [EAST WING]</span>
+                  </div>
+                  <div class="cctv-scanline"></div>
+                </div>
+                <div class="cctv-footer-overlay">
+                  <span>ACCESS EVENT #194</span>
+                  <span>PATROL INVESTIGATING</span>
+                </div>
+              </div>
+
+              <!-- Feed 3: KSR SkyGuard Drone Live Aerial Feed -->
+              <div class="cctv-monitor" id="monDroneEye">
+                <div class="cctv-header-overlay">
+                  <span class="cam-id-tag"><i class="fa-solid fa-satellite-dish cyan-pulse"></i> SKYGUARD DRONE-01
+                    (UAV)</span>
+                  <span class="cam-fps-tag">ALT: 45M | SPD: 14 KM/H</span>
+                </div>
+                <div class="cctv-screen-render cam-feed-drone">
+                  <div class="crosshair-center hud-cross"></div>
+                  <div class="drone-hud-telemetry">
+                    <span>BAT: 88% (36m AIR TIME)</span>
+                    <span>WIND: 08 KT SE</span>
+                  </div>
+                  <div class="bounding-box person-box">
+                    <span class="box-label">RESPONDER UNIT QRT-01</span>
+                  </div>
+                  <div class="cctv-scanline"></div>
+                </div>
+                <div class="cctv-footer-overlay">
+                  <span>GIMBAL: PITCH -34° YAW 120°</span>
+                  <span>GPS LOCK: 16 SATS</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- RIGHT COLUMN: Fleet Dispatch, Mass Broadcast & CAD Log -->
+      <aside class="dashboard-sidebar-right" id="sidebarRight">
+
+        <!-- Field Units & Fleet Command -->
+        <div class="panel panel-fleet-units">
+          <div class="panel-header">
+            <div>
+              <span class="panel-title"><i class="fa-solid fa-shield-halved"></i> RESPONSE TEAMS</span>
+              <span class="badge-count" id="unitsOnlineCount">6 UNITS</span>
+            </div>
+            <button class="btn-text-action" id="dispatchUnitModalBtn">+ DISPATCH</button>
+          </div>
+
+          <div class="unit-roster-list" id="unitRosterList">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- Campus Muster & Evac Population Tracker -->
+        <div class="panel panel-muster-status" id="evacStatusPanel">
+          <div class="panel-header compact">
+            <span class="panel-title"><i class="fa-solid fa-person-running"></i> MUSTER & EVAC TRACKER</span>
+            <span class="live-pill green" id="globalEvacPill">96% ACCOUNTED</span>
+          </div>
+
+          <!-- Active Live Evacuation Progress Banner (Visible during active evacuation) -->
+          <div class="active-evac-banner" id="activeEvacBanner" style="display: none;">
+            <div class="active-evac-header">
+              <div class="evac-zone-tag"><i class="fa-solid fa-triangle-exclamation"></i> <span
+                  id="evacActiveZoneName">KSRCE BLOCK B</span></div>
+              <span class="evac-pct-glow" id="evacPercentDisplay">0%</span>
+            </div>
+            <div class="evac-dynamic-progress-track">
+              <div class="evac-dynamic-progress-bar" id="evacDynamicProgressBar" style="width: 0%;"></div>
+            </div>
+            <div class="evac-stats-row">
+              <span class="stat-lbl"><i class="fa-solid fa-user-check"></i> <span id="evacAccountedText">0 / 680</span>
+                MUSTERED</span>
+              <span class="stat-rate" id="evacFlowRateText"><i class="fa-solid fa-gauge-high"></i> 18 / SEC</span>
+            </div>
+          </div>
+
+          <div class="muster-bars-container" id="musterBarsContainer">
+            <div class="muster-bar-item" id="musterBarItem1">
+              <div class="muster-meta">
+                <span class="m-name">MUSTER 1: ATHLETIC STADIUM</span>
+                <span class="m-stat green" id="muster1Stat">620 / 1200 SAFE</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-bar green" id="muster1Bar" style="width: 52%;"></div>
+              </div>
+            </div>
+
+            <div class="muster-bar-item" id="musterBarItem2">
+              <div class="muster-meta">
+                <span class="m-name">MUSTER 2: CENTRAL QUAD LAWN</span>
+                <span class="m-stat green" id="muster2Stat">890 / 1100 SAFE</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-bar green" id="muster2Bar" style="width: 81%;"></div>
+              </div>
+            </div>
+
+            <div class="muster-bar-item" id="musterBarItem3">
+              <div class="muster-meta">
+                <span class="m-name">MUSTER 3: AUDITORIUM PLAZA</span>
+                <span class="m-stat amber" id="muster3Stat">410 / 500 (HIGH CAP)</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-bar amber" id="muster3Bar" style="width: 82%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAD Live Audio / Event Log & Radio Dispatch Feed -->
+        <div class="panel panel-cad-log">
+          <div class="panel-header">
+            <span class="panel-title"><i class="fa-solid fa-tower-cell"></i> DISPATCH LOG & RADIO FEED</span>
+            <button class="filter-icon-btn" id="exportLogBtn" title="Export Incident Report (JSON)">
+              <i class="fa-solid fa-file-export"></i> EXPORT
+            </button>
+          </div>
+
+          <!-- Radio Squelch & Chatter Simulator Bar -->
+          <div class="radio-scanner-bar">
+            <div class="radio-channel-name">
+              <span class="ch-led active"></span> CH-1: KSR SECURITY DISPATCH (460.125 MHz)
+            </div>
+            <button class="ptt-btn" id="playRadioChatterBtn" title="Simulate Radio Voice & Comms Squelch">
+              <i class="fa-solid fa-walkie-talkie"></i> TEST RADIO
+            </button>
+          </div>
+
+          <div class="cad-stream-container" id="cadStreamContainer">
+            <!-- Dynamic stream entries -->
+          </div>
+
+          <div class="cad-input-box">
+            <input type="text" id="manualLogInput" placeholder="Enter manual dispatch note or 10-code...">
+            <button id="postLogBtn"><i class="fa-solid fa-paper-plane"></i></button>
+          </div>
+        </div>
+
+      </aside>
+
+    </main>
+
+    <!-- Bottom Global Status Footer -->
+    <footer class="system-footer">
+      <div class="footer-left">
+        <span class="sys-dot ok"></span>
+        <span>KSR ECC COMMAND SERVER [ENCRYPTED 256-BIT]</span>
+        <span class="sys-divider">|</span>
+        <span>CAMPUS POPULATION: 18,500 STUDENTS & STAFF</span>
+        <span class="sys-divider">|</span>
+        <span>LOCATION: TIRUCHENGODE, TN | 29°C HUMIDITY 64%</span>
+      </div>
+      <div class="footer-right">
+        <span class="sys-tag">NDRF & TN DISASTER PROTOCOLS</span>
+        <span class="sys-tag">NAAC A++ ACCREDITED</span>
+        <button class="footer-help-btn" id="shortcutGuideBtn"><i class="fa-solid fa-keyboard"></i> SHORTCUTS</button>
+      </div>
+    </footer>
+
+    <!-- Mobile Responsive Bottom Navigation Dock -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+      <button class="mobile-nav-btn active" data-tab="map">
+        <i class="fa-solid fa-map-location-dot"></i>
+        <span>Map</span>
+      </button>
+      <button class="mobile-nav-btn" data-tab="alerts">
+        <i class="fa-solid fa-bell"></i>
+        <span>Alerts</span>
+        <span class="mobile-badge" id="mobileBadgeIncidents">3</span>
+      </button>
+      <button class="mobile-nav-btn" data-tab="tracking">
+        <i class="fa-solid fa-stopwatch"></i>
+        <span>Tracking</span>
+      </button>
+      <button class="mobile-nav-btn" data-tab="teams">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Teams</span>
+      </button>
+      <button class="mobile-nav-btn" data-tab="history">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <span>History</span>
+      </button>
+      <button class="mobile-nav-btn mobile-sos-btn" id="mobileSosBtn">
+        <i class="fa-solid fa-plus"></i>
+        <span>REPORT</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- ==================== MODALS & OVERLAYS ==================== -->
+
+  <!-- Modal 1: Mass Emergency EAS Broadcast System -->
+  <div class="modal-backdrop" id="broadcastModal">
+    <div class="modal-dialog modal-large">
+      <div class="modal-header emergency-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-tower-broadcast modal-icon-glow"></i>
+          <div>
+            <h3>KSR EMERGENCY MASS BROADCAST (EAS)</h3>
+            <p>Transmit instant alerts via SMS, Student Mobile App, Acoustic Sirens, and Campus Digital Screens.</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close="broadcastModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Preset Templates Selector -->
+        <div class="form-group">
+          <label class="form-label">PRE-CONFIGURED CRISIS TEMPLATES</label>
+          <div class="template-selector-grid">
+            <button class="template-btn" data-tpl="shelter">
+              <i class="fa-solid fa-person-shelter"></i>
+              <span>Active Threat / Shelter-in-Place</span>
+            </button>
+            <button class="template-btn" data-tpl="hazmat">
+              <i class="fa-solid fa-biohazard"></i>
+              <span>Chemical / Lab Gas Evacuation</span>
+            </button>
+            <button class="template-btn" data-tpl="weather">
+              <i class="fa-solid fa-cloud-bolt"></i>
+              <span>Severe Monsoon / Lightning Warning</span>
+            </button>
+            <button class="template-btn" data-tpl="allclear">
+              <i class="fa-solid fa-shield-check"></i>
+              <span>All Clear / Return to Normal</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Target Channels -->
+        <div class="form-group">
+          <label class="form-label">TRANSMISSION CHANNELS</label>
+          <div class="channels-checkbox-grid">
+            <label class="ch-box checked"><input type="checkbox" checked id="chkSms"> <i
+                class="fa-solid fa-comment-sms"></i> Student & Staff SMS (18,500)</label>
+            <label class="ch-box checked"><input type="checkbox" checked id="chkApp"> <i
+                class="fa-solid fa-mobile-screen"></i> KSR Safety App Push</label>
+            <label class="ch-box checked"><input type="checkbox" checked id="chkSirens"> <i
+                class="fa-solid fa-bullhorn"></i> Campus Outdoor Siren Towers</label>
+            <label class="ch-box checked"><input type="checkbox" checked id="chkSigns"> <i
+                class="fa-solid fa-chalkboard"></i> Digital Notice Boards & Classrooms</label>
+            <label class="ch-box checked"><input type="checkbox" checked id="chkEmail"> <i
+                class="fa-solid fa-envelope"></i> Priority Institutional Email</label>
+            <label class="ch-box checked"><input type="checkbox" checked id="chkWarden"> <i
+                class="fa-solid fa-walkie-talkie"></i> Hostel Wardens & Security Radio</label>
+          </div>
+        </div>
+
+        <!-- Message Body -->
+        <div class="form-group">
+          <label class="form-label" for="broadcastMsgText">MESSAGE CONTENT (EAS FORMATTED)</label>
+          <textarea id="broadcastMsgText" class="form-control"
+            rows="4">EMERGENCY ALERT: Chemical containment valve anomaly near KSRCAS BioTech Wing (3rd Floor). Evacuate building immediately. Move to Assembly Area M1 (Athletic Stadium). Await instructions from emergency personnel.</textarea>
+          <div class="char-count-row">
+            <span>Character Count: <strong id="charCount">216</strong> / 320</span>
+            <span class="warning-text"><i class="fa-solid fa-triangle-exclamation"></i> Will override silence settings
+              on student safety app</span>
+          </div>
+        </div>
+
+        <!-- Target Zone Filter -->
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label class="form-label">TARGET CAMPUS ZONE</label>
+            <select class="form-control" id="broadcastZoneSelect">
+              <option value="all">Entire KSR Campus (All Institutions)</option>
+              <option value="ksrcas" selected>KSRCAS BioTech & Science Quad</option>
+              <option value="ksrct">KSRCT Technical Campus Block</option>
+              <option value="ksrce">KSRCE Engineering Block</option>
+              <option value="dental">KSR Dental College & Hospital</option>
+              <option value="hostels">Bharathi & Tagore Hostels Only</option>
+              <option value="sports">Athletics Stadium & Sports Ground</option>
+            </select>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-label">AUDIO SIREN KLAXON TONE</label>
+            <select class="form-control" id="broadcastSirenSound">
+              <option value="wail">High-Low Evacuation Wail</option>
+              <option value="whoop">Fast High-Pitch Attack Tone</option>
+              <option value="chime">Gentle Advisory Chime</option>
+              <option value="none">Silent Broadcast (Digital Only)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Broadcast Progress Container -->
+        <div class="transmission-status-bar" id="transmissionStatusBox" style="display: none;">
+          <div class="trans-label">
+            <span>TRANSMITTING EMERGENCY ALERT TO 18,500 RECIPIENTS...</span>
+            <span id="transPct">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-bar progress-broadcast" id="transBar" style="width: 0%;"></div>
+          </div>
+          <div class="trans-sub" id="transSub">Contacting Telecom SMS Gateway & Outdoor PA Amplifiers...</div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="broadcastModal">Cancel</button>
+        <button class="btn btn-danger-solid btn-glow" id="executeBroadcastBtn">
+          <i class="fa-solid fa-tower-broadcast"></i> TRANSMIT EMERGENCY BROADCAST
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: ➕ REPORT EMERGENCY / DISPATCH TICKET (COMPREHENSIVE) -->
+  <div class="modal-backdrop" id="newIncidentModal">
+    <div class="modal-dialog modal-large">
+      <div class="modal-header emergency-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-circle-exclamation modal-icon-glow"></i>
+          <div>
+            <h3>REPORT EMERGENCY INCIDENT / DISPATCH TICKET</h3>
+            <p>Log incoming emergency report, blue-light call, or direct field alert to KSR Command Center.</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close="newIncidentModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Caller / Reporter Info Row -->
+        <div class="form-row">
+          <div class="form-group col-4">
+            <label class="form-label">CALLER / REPORTER NAME *</label>
+            <input type="text" class="form-control" id="newIncCallerName" placeholder="Full Name..."
+              value="Student / Faculty">
+          </div>
+          <div class="form-group col-4">
+            <label class="form-label">CONTACT NUMBER *</label>
+            <input type="text" class="form-control" id="newIncCallerPhone" placeholder="Mobile (+91...)"
+              value="+91 98765 43210">
+          </div>
+          <div class="form-group col-4">
+            <label class="form-label">REPORTER ROLE</label>
+            <select class="form-control" id="newIncReporterRole">
+              <option value="Student">Student (KSRCT/KSRCE/KSRCAS)</option>
+              <option value="Faculty">Faculty / Professor</option>
+              <option value="Hostel Warden">Hostel Warden</option>
+              <option value="Campus Security">Campus Security Officer</option>
+              <option value="Lab Technician">Lab Technician</option>
+              <option value="Visitor">Visitor / Contractor</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">INCIDENT TITLE / NATURE OF EMERGENCY *</label>
+          <input type="text" class="form-control" id="newIncTitle"
+            placeholder="e.g. Chemical Vapor Leak, Chest Pain, Electrical Short Circuit..."
+            value="Electrical Sparking & Smoke in Computer Lab">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label class="form-label">EMERGENCY CATEGORY</label>
+            <select class="form-control" id="newIncCategory">
+              <option value="fire">🔥 Fire / Smoke / Electrical Hazard</option>
+              <option value="medical">🚑 Medical Emergency (AED / Trauma)</option>
+              <option value="chemical">🧪 Chemical / Bio-Lab Anomaly</option>
+              <option value="security">🚨 Campus Security / Unauthorized Access</option>
+              <option value="facility">⚡ Facility / Power / Water Failure</option>
+              <option value="weather">🌪️ Severe Weather / Storm Damage</option>
+            </select>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-label">SEVERITY PRIORITY</label>
+            <select class="form-control" id="newIncPriority">
+              <option value="critical">🔴 CRITICAL (Immediate Life Threat)</option>
+              <option value="high" selected>🟠 HIGH (Urgent Response Required)</option>
+              <option value="medium">🟡 MEDIUM (Assistance Needed)</option>
+              <option value="low">🔵 LOW (Advisory / Inspection)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Campus Location Picker -->
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label class="form-label">KSR CAMPUS BUILDING / ZONE</label>
+            <select class="form-control" id="newIncLocation">
+              <option value="bld-ksrcas">KSRCAS Arts & Science College</option>
+              <option value="bld-ksrct" selected>KSRCT Technical Main Complex</option>
+              <option value="bld-ksrce">KSRCE Engineering Block</option>
+              <option value="bld-dental">KSR Dental College & Hospital</option>
+              <option value="bld-hostels">KSR Hostels (Bharathi/Tagore)</option>
+              <option value="bld-sports">Athletics Stadium & Track Ground</option>
+              <option value="bld-library">Central Digital Library</option>
+              <option value="bld-foodcourt">Food Court & Amenities Plaza</option>
+              <option value="bld-admin">Centenary Admin Tower</option>
+              <option value="bld-gate1">Main Highway Gate 1 Checkpoint</option>
+              <option value="bld-auditorium">Kalvi Arangam A/C Auditorium</option>
+            </select>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-label">ASSIGN INITIAL RESPONSE TEAM</label>
+            <select class="form-control" id="newIncAssignee">
+              <option value="KSR QRT Alpha">KSR QRT Alpha (Patrol Cruiser)</option>
+              <option value="KSR Health Ambulance 01">KSR Health Ambulance 01 (ICU)</option>
+              <option value="KSR Fire Tender 01">KSR Fire Tender 01 (Water Bowser)</option>
+              <option value="KSR SkyGuard UAV">KSR SkyGuard UAV (Surveillance Drone)</option>
+              <option value="KSR Bike Squad 03">KSR Bike Patrol Squad 03</option>
+              <option value="Electrical Squad">Electrical & Infrastructure Squad</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Quick Detail Chips -->
+        <div class="form-group">
+          <label class="form-label">QUICK SITUATIONAL TAGS</label>
+          <div class="quick-tags-selector">
+            <span class="quick-chip" data-text="Dense smoke observed near switchboard. Students exiting safely."><i
+                class="fa-solid fa-smog"></i> Dense Smoke</span>
+            <span class="quick-chip" data-text="Person unconscious, bystander administering CPR."><i
+                class="fa-solid fa-heart-pulse"></i> Unconscious Person</span>
+            <span class="quick-chip" data-text="Chemical acid bottle broken on floor, toxic vapor detected."><i
+                class="fa-solid fa-flask"></i> Chemical Spill</span>
+            <span class="quick-chip" data-text="Unauthorized vehicle bypassed Gate 1 checkpoint at high speed."><i
+                class="fa-solid fa-car-burst"></i> Gate Trespasser</span>
+            <span class="quick-chip" data-text="Electrical power blackout with loud arcing sound."><i
+                class="fa-solid fa-bolt"></i> Power Arcing</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">DETAILED DISPATCH & SITUATION NOTES</label>
+          <textarea class="form-control" id="newIncNotes"
+            rows="3">Dense smoke observed in 2nd Floor Server / Computer Room. Main breaker tripped. Requesting immediate electrical and fire unit deployment.</textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="newIncidentModal">Cancel</button>
+        <button class="btn btn-primary btn-glow" id="saveNewIncidentBtn">
+          <i class="fa-solid fa-plus-circle"></i> BROADCAST SOS & DISPATCH
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Campus Lockdown Confirmation Modal -->
+  <div class="modal-backdrop" id="lockdownModal">
+    <div class="modal-dialog modal-lockdown">
+      <div class="modal-header modal-lockdown-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-lock modal-lock-icon"></i>
+          <div>
+            <h3>INITIATE FULL KSR CAMPUS LOCKDOWN</h3>
+            <p>CRITICAL ACTION: Automatic electromagnetic perimeter gate override</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close="lockdownModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="lockdown-warning-card">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <div>
+            <strong>KSR SECURITY OVERRIDE AUTHORIZATION</strong>
+            <p>Triggering this command will instantly lock all 148 exterior magnetic portals and gate barriers across
+              KSRCT, KSRCE, KSRCAS, Dental College, and Residential Hostels. Only Chief Security Officer biometric
+              overrides will function.</p>
+          </div>
+        </div>
+
+        <div class="lockdown-checkboxes">
+          <label class="check-item"><input type="checkbox" checked id="lockAcademic"> Lock Academic & Classroom Portals
+            (42 Buildings)</label>
+          <label class="check-item"><input type="checkbox" checked id="lockResidence"> Lock All Hostel Security Gates
+            (Bharathi, Tagore, Teresa)</label>
+          <label class="check-item"><input type="checkbox" checked id="lockGates"> Seal Main Highway Gate 1 & Auxiliary
+            Checkposts</label>
+          <label class="check-item"><input type="checkbox" checked id="lockSirens"> Sound Campus-Wide Acoustic Lockdown
+            Klaxon</label>
+        </div>
+
+        <div class="security-code-input-wrap">
+          <label class="form-label">COMMAND PIN AUTHORIZATION</label>
+          <input type="password" class="form-control text-center" id="lockdownPasscode"
+            placeholder="ENTER 4-DIGIT PIN (DEFAULT: 9911)" value="9911">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="lockdownModal">Abort</button>
+        <button class="btn btn-danger-solid" id="confirmLockdownActionBtn">
+          <i class="fa-solid fa-lock"></i> EXECUTE LOCKDOWN NOW
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Building Inspection Detail Modal -->
+  <div class="modal-backdrop" id="buildingInspectModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-building-shield"></i>
+          <div>
+            <h3 id="inspectBldName">Building Inspection</h3>
+            <p id="inspectBldSubtitle">Zone Telemetry & Facility Control</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close="buildingInspectModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="bld-stats-matrix">
+          <div class="bld-stat-card">
+            <span class="lbl">OCCUPANCY</span>
+            <span class="val" id="inspectBldOcc">540 / 900</span>
+          </div>
+          <div class="bld-stat-card">
+            <span class="lbl">PORTALS</span>
+            <span class="val green" id="inspectBldDoors">16 / 16 LOCKED</span>
+          </div>
+          <div class="bld-stat-card">
+            <span class="lbl">FIRE SUPPRESSION</span>
+            <span class="val green" id="inspectBldFire">ACTIVE (NORMAL)</span>
+          </div>
+          <div class="bld-stat-card">
+            <span class="lbl">AIR HANDLING (HVAC)</span>
+            <span class="val warning" id="inspectBldHvac">PURGE ISOLATION</span>
+          </div>
+        </div>
+
+        <div class="form-group mt-3">
+          <label class="form-label">FACILITY REMOTE CONTROLS</label>
+          <div class="facility-override-btns">
+            <button class="btn-override" id="btnHvacPurge"><i class="fa-solid fa-fan"></i> Purge HVAC</button>
+            <button class="btn-override" id="btnToggleBldLock"><i class="fa-solid fa-lock"></i> Lock/Unlock</button>
+            <button class="btn-override" id="btnEvacuateBld"><i class="fa-solid fa-person-walking-arrow-right"></i>
+              Strobe Alarm</button>
+          </div>
+        </div>
+
+        <div class="form-group mt-3">
+          <label class="form-label">ATTACHED LIVE SURVEILLANCE FEED</label>
+          <div class="inspect-cam-preview" id="inspectCamBox">
+            <div class="crosshair-center"></div>
+            <div class="inspect-cam-badge"><i class="fa-solid fa-video"></i> INTERIOR CORRIDOR FEED</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="buildingInspectModal">Close</button>
+        <button class="btn btn-primary" id="btnDispatchToBld">
+          <i class="fa-solid fa-car"></i> Dispatch Patrol Here
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Incident History Inspection Modal -->
+  <div class="modal-backdrop" id="historyDetailModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-file-invoice"></i>
+          <div>
+            <h3 id="histDetailTitle">Incident After-Action Record</h3>
+            <p id="histDetailSubtitle">Archived Investigation Log</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close="historyDetailModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body" id="histDetailBody">
+        <!-- Rendered dynamically via JS -->
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="historyDetailModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 6: Keyboard Shortcuts Guide -->
+  <div class="modal-backdrop" id="shortcutsModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-keyboard"></i>
+          <div>
+            <h3>TACTICAL SHORTCUTS & OPERATOR HOTKEYS</h3>
+            <p>Fast-access controls for KSR Command Console operators</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close="shortcutsModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <table class="shortcuts-table">
+          <tr>
+            <td><kbd>B</kbd></td>
+            <td>Trigger Mass Broadcast (EAS) Modal</td>
+          </tr>
+          <tr>
+            <td><kbd>L</kbd></td>
+            <td>Initiate Campus Perimeter Lockdown</td>
+          </tr>
+          <tr>
+            <td><kbd>N</kbd> or <kbd>R</kbd></td>
+            <td>Report Emergency / Create Incident Ticket</td>
+          </tr>
+          <tr>
+            <td><kbd>M</kbd></td>
+            <td>Toggle Tactical Audio & Sirens (Mute/Unmute)</td>
+          </tr>
+          <tr>
+            <td><kbd>Space</kbd></td>
+            <td>Recenter & Focus Active Hazard on Map</td>
+          </tr>
+          <tr>
+            <td><kbd>1</kbd> - <kbd>4</kbd></td>
+            <td>Quick-set Threat Level (Normal, Amber, Red, Black)</td>
+          </tr>
+          <tr>
+            <td><kbd>Esc</kbd></td>
+            <td>Close Active Modal Window</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-close="shortcutsModal">Understood</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 7: Real-Time Simulation Cockpit & Scenario Control Panel -->
+  <div class="modal-backdrop" id="simCockpitModal">
+    <div class="modal-dialog modal-large">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-gamepad modal-icon-glow"></i>
+          <div>
+            <h3>KSR CRISIS SIMULATION COCKPIT & SCENARIO ENGINE</h3>
+            <p>Live interactive controls for autonomous drills, dynamic emergency alerts, moving evacuees & responder
+              fleet</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close="simCockpitModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="sim-cockpit-grid">
+
+          <!-- Section 1: Engine Master State -->
+          <div class="sim-section-box">
+            <div class="sim-section-title">
+              <span><i class="fa-solid fa-microchip"></i> SIMULATION ENGINE CONTROLS</span>
+              <span class="sim-pill-status" id="modalSimStatusPill">RUNNING (1X)</span>
+            </div>
+            <div class="sim-engine-bar">
+              <button class="sim-btn-play" id="btnSimResume"><i class="fa-solid fa-play"></i> START / RESUME</button>
+              <button class="sim-btn-pause" id="btnSimPause"><i class="fa-solid fa-pause"></i> PAUSE / STOP</button>
+              <button class="sim-btn-reset" id="btnSimReset"><i class="fa-solid fa-rotate-left"></i> RESET TO
+                GREEN</button>
+
+              <div class="sim-speed-group">
+                <span style="font-size: 10px; color: #64748b; margin-right: 6px; font-weight: 700;">SPEED:</span>
+                <button class="sim-speed-btn active" data-speed="1">1X</button>
+                <button class="sim-speed-btn" data-speed="2">2X</button>
+                <button class="sim-speed-btn" data-speed="5">5X</button>
+              </div>
+
+              <label class="ch-box checked" style="margin-left: auto; font-size: 11px;">
+                <input type="checkbox" checked id="chkAutoEvents"> <i class="fa-solid fa-dice"></i> Autonomous Events
+              </label>
+            </div>
+          </div>
+
+          <!-- Section 2: Mock Incidents Injection Grid (Specifically requested: Fire in Block B, Medical in Library) -->
+          <div class="sim-section-box">
+            <div class="sim-section-title">
+              <span><i class="fa-solid fa-bolt-lightning"></i> TRIGGER MOCK INCIDENTS (INSTANT SCENARIOS)</span>
+              <span style="font-size: 11px; color: #94a3b8;">Click any card to inject live event</span>
+            </div>
+
+            <div class="mock-incidents-grid">
+
+              <!-- Fire in Block B Card -->
+              <div class="mock-card card-fire" id="triggerMockFireBlockB">
+                <div class="mock-card-header">
+                  <span class="mock-card-title"><i class="fa-solid fa-fire-flame-curved" style="color: #ef4444;"></i>
+                    Fire in Block B</span>
+                  <span class="threat-dot" style="background: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
+                </div>
+                <div class="mock-card-desc">Electrical short & fire in KSRCE Block B Robotics Lab 204. Full evacuation
+                  to Stadium, sirens & fire fleet dispatched.</div>
+                <div class="mock-card-footer">
+                  <span>KSRCE BLOCK • PRIORITY 1</span>
+                  <span class="mock-action-link">TRIGGER NOW <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+              </div>
+
+              <!-- Medical Emergency in Library Card -->
+              <div class="mock-card card-med" id="triggerMockMedLibrary">
+                <div class="mock-card-header">
+                  <span class="mock-card-title"><i class="fa-solid fa-truck-medical" style="color: #06b6d4;"></i>
+                    Medical in Library</span>
+                  <span class="threat-dot" style="background: #06b6d4; box-shadow: 0 0 6px #06b6d4;"></span>
+                </div>
+                <div class="mock-card-desc">Acute cardiac/heat collapse on 2nd Floor reading hall. Dispatches Ambulance
+                  01 with sirens, paramedic care milestones.</div>
+                <div class="mock-card-footer">
+                  <span>CENTRAL LIB • PRIORITY 1</span>
+                  <span class="mock-action-link">TRIGGER NOW <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+              </div>
+
+              <!-- BioTech Hazmat Card -->
+              <div class="mock-card card-chem" id="triggerMockHazmat">
+                <div class="mock-card-header">
+                  <span class="mock-card-title"><i class="fa-solid fa-biohazard" style="color: #a855f7;"></i> BioTech
+                    Chem Leak</span>
+                  <span class="threat-dot" style="background: #a855f7;"></span>
+                </div>
+                <div class="mock-card-desc">Hazardous acid vapor leak in KSRCAS BioTech Wing Lab 3B. 150m cordon
+                  perimeter, VOC sensor spike.</div>
+                <div class="mock-card-footer">
+                  <span>KSRCAS WING • CRITICAL</span>
+                  <span class="mock-action-link">TRIGGER NOW <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+              </div>
+
+              <!-- Gate 1 Security Breach Card -->
+              <div class="mock-card card-sec" id="triggerMockLockdown">
+                <div class="mock-card-header">
+                  <span class="mock-card-title"><i class="fa-solid fa-shield-halved" style="color: #f59e0b;"></i> Gate 1
+                    Perimeter Breach</span>
+                  <span class="threat-dot" style="background: #f59e0b;"></span>
+                </div>
+                <div class="mock-card-desc">Unauthorized vehicle breeches highway boom barrier. Bike Patrol Squad 03
+                  deployed, perimeter lock protocol.</div>
+                <div class="mock-card-footer">
+                  <span>HIGHWAY GATE 1 • HIGH</span>
+                  <span class="mock-action-link">TRIGGER NOW <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+              </div>
+
+              <!-- 110kV Substation Arc Card -->
+              <div class="mock-card card-elec" id="triggerMockSubstation">
+                <div class="mock-card-header">
+                  <span class="mock-card-title"><i class="fa-solid fa-bolt" style="color: #3b82f6;"></i> Substation Arc
+                    Flash</span>
+                  <span class="threat-dot" style="background: #3b82f6;"></span>
+                </div>
+                <div class="mock-card-desc">110kV transformer breaker arc. Grid power drop, Disaster Electrical Squad
+                  deployed, diesel generators active.</div>
+                <div class="mock-card-footer">
+                  <span>110KV SUBSTATION • MED</span>
+                  <span class="mock-action-link">TRIGGER NOW <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Section 3: Live Evacuation Movement Controller -->
+          <div class="sim-section-box">
+            <div class="sim-section-title">
+              <span><i class="fa-solid fa-person-running"></i> ZONE EVACUATION FLOW SIMULATION</span>
+              <span style="font-size: 11px; color: #94a3b8;">Controls dynamic moving evacuation rates</span>
+            </div>
+            <div class="form-row" style="align-items: flex-end; gap: 12px;">
+              <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label class="form-label">SELECT FACILITY ZONE TO EVACUATE</label>
+                <select id="simEvacTargetSelect" class="form-control">
+                  <option value="bld-ksrce" selected>KSRCE Block B Engineering (680 Occupants) -> Muster 1 Stadium
+                  </option>
+                  <option value="bld-ksrcas">KSRCAS Arts & Science BioTech Wing (540 Occupants) -> Muster 1 Stadium
+                  </option>
+                  <option value="bld-library">Central Digital Library (840 Occupants) -> Muster 2 Quad Lawn</option>
+                  <option value="bld-hostels">Bharathi / Tagore Hostels (1,850 Occupants) -> Muster 1 Stadium</option>
+                  <option value="bld-foodcourt">Food Court & Amenities Plaza (620 Occupants) -> Muster 3 Plaza</option>
+                </select>
+              </div>
+              <button class="btn btn-warning" id="btnSimTriggerEvac" style="white-space: nowrap;"><i
+                  class="fa-solid fa-person-walking-arrow-right"></i> ENGAGE EVACUATION</button>
+              <button class="btn btn-secondary" id="btnSimHaltEvac" style="white-space: nowrap;"><i
+                  class="fa-solid fa-circle-stop"></i> HALT EVAC</button>
+            </div>
+          </div>
+
+          <!-- Section 4: Tactical Audio Cues & Sound Alerts (Toggle & Test Pads) -->
+          <div class="sim-section-box">
+            <div class="sim-section-title">
+              <span><i class="fa-solid fa-volume-high"></i> TACTICAL SOUND ALERTS & AUDIO CUES</span>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="hud-btn hud-btn-audio" id="modalAudioToggleBtn"
+                  style="padding: 4px 10px; font-size: 11px;">
+                  <i class="fa-solid fa-volume-high" id="modalAudioIcon"></i>
+                  <span id="modalAudioStatusText">AUDIO ON</span>
+                </button>
+              </div>
+            </div>
+
+            <p style="font-size: 11.5px; color: #94a3b8; margin: 0 0 10px 0;">Auditory cues synthesize real tactical
+              sirens, dispatcher pings, and VHF radio chatter using Web Audio API:</p>
+
+            <div class="audio-cues-grid">
+              <button class="sound-test-btn" data-sound="fire"><i class="fa-solid fa-fire-burner"
+                  style="color: #ef4444;"></i> Fire Alarm Wail</button>
+              <button class="sound-test-btn" data-sound="medical"><i class="fa-solid fa-truck-medical"
+                  style="color: #06b6d4;"></i> EMS Two-Tone</button>
+              <button class="sound-test-btn" data-sound="klaxon"><i class="fa-solid fa-bullhorn"
+                  style="color: #f59e0b;"></i> Klaxon Sweep</button>
+              <button class="sound-test-btn" data-sound="squelch"><i class="fa-solid fa-walkie-talkie"
+                  style="color: #38bdf8;"></i> Radio Squelch</button>
+              <button class="sound-test-btn" data-sound="dispatch"><i class="fa-solid fa-tower-broadcast"
+                  style="color: #a855f7;"></i> Dispatch Chirp</button>
+              <button class="sound-test-btn" data-sound="evac"><i class="fa-solid fa-bell" style="color: #fca5a5;"></i>
+                Evac Strobe Pulse</button>
+              <button class="sound-test-btn" data-sound="chime"><i class="fa-solid fa-circle-check"
+                  style="color: #34d399;"></i> Success Triad</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <span style="font-size: 11px; color: #64748b; margin-right: auto; font-family: var(--font-mono);"><i
+            class="fa-solid fa-circle-info"></i> Keyboard Shortcut: Press [S] to toggle this cockpit anytime</span>
+        <button class="btn btn-secondary" data-close="simCockpitModal">Close Cockpit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Tactical Audio Synthesizer Engine & Application Script -->
+  <script src="app.js"></script>
+</body>
+
+</html>

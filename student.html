@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KSR INSTITUTIONS — CampusGuard Emergency SOS Portal</title>
+  <meta name="description"
+    content="KSR INSTITUTIONS — CampusGuard Emergency SOS Portal. 24/7 student emergency response, live ambulance dispatch with GPS tracking, and instant safety reporting.">
+  <meta name="theme-color" content="#dc2626">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #dc2626;
+      --primary-dark: #b91c1c;
+      --primary-glow: rgba(220, 38, 38, 0.35);
+      --amber: #f59e0b;
+      --green: #10b981;
+      --blue: #2563eb;
+      --bg: #0b1329;
+      --card-bg: #111e38;
+      --card-border: #1e3056;
+      --card-hover: #17294d;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --input-bg: #0c1830;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOP HEADER */
+    .top-nav {
+      background: #080e1f;
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .crest-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 1.5px solid #f59e0b;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+    }
+
+    .brand-title h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .brand-title p {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .connection-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 99px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.9);
+        opacity: 0.8;
+      }
+
+      50% {
+        transform: scale(1.3);
+        opacity: 1;
+        box-shadow: 0 0 8px #10b981;
+      }
+
+      100% {
+        transform: scale(0.9);
+        opacity: 0.8;
+      }
+    }
+
+    /* QUICK HELPLINE CALL BAR */
+    .emergency-banner {
+      background: linear-gradient(90deg, #991b1b, #dc2626);
+      color: white;
+      padding: 10px 16px;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .banner-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+
+    .banner-call-btn {
+      background: white;
+      color: #b91c1c;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 99px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* MAIN CONTAINER */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 16px 80px;
+      width: 100%;
+    }
+
+    /* TABS */
+    .tabs-nav {
+      display: flex;
+      background: #0f1930;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 22px;
+      border: 1px solid var(--card-border);
+      gap: 4px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      flex: 1;
+      min-width: 120px;
+      padding: 11px 16px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-weight: 700;
+      font-size: 13px;
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: #dc2626;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+    }
+
+    /* CARD STYLING */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    /* FORM ELEMENTS */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    label span.req {
+      color: #ef4444;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+    }
+
+    select option {
+      background: #0f172a;
+      color: #fff;
+    }
+
+    /* EMERGENCY TYPE TILES */
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .type-tile {
+      background: #0d1a33;
+      border: 1.5px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .type-tile i {
+      font-size: 22px;
+      color: #94a3b8;
+    }
+
+    .type-tile span {
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+
+    .type-tile:hover {
+      background: #142447;
+      border-color: #3b82f6;
+    }
+
+    .type-tile.selected {
+      background: rgba(220, 38, 38, 0.18);
+      border-color: #dc2626;
+      box-shadow: 0 0 15px rgba(220, 38, 38, 0.35);
+    }
+
+    .type-tile.selected i {
+      color: #ef4444;
+      transform: scale(1.1);
+    }
+
+    .type-tile.selected span {
+      color: #fff;
+    }
+
+    /* PRIORITY PILLS */
+    .priority-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .priority-pill {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1.5px solid var(--card-border);
+      background: #0d1a33;
+      color: #94a3b8;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .priority-pill.critical.selected {
+      background: rgba(220, 38, 38, 0.25);
+      border-color: #dc2626;
+      color: #fca5a5;
+    }
+
+    .priority-pill.high.selected {
+      background: rgba(245, 158, 11, 0.25);
+      border-color: #f59e0b;
+      color: #fde68a;
+    }
+
+    .priority-pill.medium.selected {
+      background: rgba(59, 130, 246, 0.25);
+      border-color: #3b82f6;
+      color: #bfdbfe;
+    }
+
+
+    /* REPORTING PERSON ROLES (STUDENT / FACULTY / SECURITY / WORKER) */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 640px) {
+      .role-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .role-tile {
+      background: #0d1a33;
+      border: 1.5px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+
+    .role-tile i {
+      font-size: 22px;
+      color: #94a3b8;
+      transition: all 0.2s ease;
+    }
+
+    .role-tile span {
+      font-size: 13px;
+      font-weight: 700;
+      color: #cbd5e1;
+      transition: color 0.2s ease;
+    }
+
+    .role-tile:hover {
+      background: #142447;
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+    }
+
+    .role-tile.selected {
+      background: rgba(6, 182, 212, 0.16);
+      border-color: #06b6d4;
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.35);
+    }
+
+    .role-tile.selected i {
+      color: #38bdf8;
+      transform: scale(1.15);
+    }
+
+    .role-tile.selected span {
+      color: #fff;
+    }
+
+    /* GPS BUTTON & ACCURACY */
+    /* CURRENT LOCATION CARD & GPS STYLING */
+    .current-location-card {
+      background: linear-gradient(145deg, #09152b, #0d1e3d);
+      border: 1.5px solid rgba(56, 189, 248, 0.35);
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .current-location-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .loc-title {
+      font-weight: 800;
+      font-size: 14px;
+      color: #38bdf8;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gps-btn-main {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      border: none;
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 11px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      position: relative;
+    }
+
+    .gps-btn-main:hover {
+      background: linear-gradient(135deg, #0369a1, #1d4ed8);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+    }
+
+    .gps-btn-main.loading {
+      background: #334155;
+      cursor: wait;
+    }
+
+    .location-details-box {
+      display: none;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 12px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .loc-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .loc-metric-item {
+      background: #09101f;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    .loc-metric-item .lbl {
+      font-size: 10px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .loc-metric-item .val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .auto-building-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .mini-loc-map {
+      width: 100%;
+      height: 150px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      margin-top: 10px;
+    }
+
+    .mini-loc-map iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .loc-actions-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .btn-view-gmaps {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #38bdf8;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-view-gmaps:hover {
+      background: #1e293b;
+      color: #fff;
+    }
+
+    .live-track-toggle {
+      font-size: 12px;
+      color: #94a3b8;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+
+
+
+    /* SUBMIT SOS BUTTON */
+    .submit-sos-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      padding: 18px 24px;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(220, 38, 38, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all 0.25s;
+      margin-top: 10px;
+    }
+
+    .submit-sos-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(220, 38, 38, 0.6);
+      background: linear-gradient(135deg, #f87171, #dc2626);
+    }
+
+    .submit-sos-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* ACTIVE TRACKER CARD */
+    .active-tracker {
+      display: none;
+      border-left: 6px solid #10b981;
+      background: linear-gradient(180deg, #0e203f, #09152b);
+    }
+
+    .tracker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .ticket-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 800;
+      color: #38bdf8;
+    }
+
+    .status-badge {
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge.reported {
+      background: rgba(245, 158, 11, 0.2);
+      color: #f59e0b;
+      border: 1px solid #f59e0b;
+    }
+
+    .status-badge.accepted {
+      background: rgba(37, 99, 235, 0.2);
+      color: #60a5fa;
+      border: 1px solid #3b82f6;
+      animation: pulse 1.5s infinite;
+    }
+
+    .status-badge.arrived {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid #10b981;
+    }
+
+    .status-badge.picked_up {
+      background: rgba(168, 85, 247, 0.2);
+      color: #c084fc;
+      border: 1px solid #a855f7;
+    }
+
+    .status-badge.resolved {
+      background: rgba(16, 185, 129, 0.25);
+      color: #6ee7b7;
+      border: 1px solid #10b981;
+    }
+
+    /* STEPPER TIMELINE */
+    .stepper {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin: 24px 0 20px;
+    }
+
+    .stepper::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      right: 20px;
+      height: 3px;
+      background: #1e293b;
+      z-index: 1;
+    }
+
+    .step-item {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .step-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1e293b;
+      border: 2px solid #334155;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      color: #94a3b8;
+      transition: all 0.3s;
+    }
+
+    .step-item.done .step-circle {
+      background: #10b981;
+      border-color: #10b981;
+      color: white;
+    }
+
+    .step-item.active .step-circle {
+      background: #dc2626;
+      border-color: #ef4444;
+      color: white;
+      box-shadow: 0 0 14px rgba(220, 38, 38, 0.6);
+      animation: pulse 1.2s infinite;
+    }
+
+    .step-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+
+    .step-item.done .step-label,
+    .step-item.active .step-label {
+      color: #fff;
+    }
+
+    .driver-assigned-card {
+      background: #091326;
+      border: 1px solid #2563eb;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .driver-info b {
+      font-size: 15px;
+      color: #fff;
+      display: block;
+    }
+
+    .driver-info span {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .btn-call-driver {
+      background: #10b981;
+      color: white;
+      text-decoration: none;
+      padding: 9px 18px;
+      border-radius: 99px;
+      font-weight: 800;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* DIRECT HELPLINE DIRECTORY */
+    .helpline-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .helpline-card {
+      background: #0d1a33;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .helpline-info b {
+      display: block;
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .helpline-info span {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .helpline-dial-btn {
+      background: #2563eb;
+      color: white;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    /* CAMPUS MAP */
+    .campus-map-box {
+      height: 380px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      margin-top: 10px;
+    }
+
+    .campus-map-box iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* TOAST NOTIFICATION */
+    .toast-msg {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: #fff;
+      border: 1px solid #334155;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      padding: 12px 22px;
+      border-radius: 99px;
+      font-size: 14px;
+      font-weight: 700;
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        padding: 12px 10px 80px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .brand-title h1 {
+        font-size: 15px;
+      }
+
+      .stepper {
+        margin: 16px 0;
+      }
+
+      .step-label {
+        font-size: 9px;
+      }
+
+      .step-circle {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP HEADER -->
+  <header class="top-nav">
+    <div class="brand-wrap">
+      <div class="crest-icon">
+        <i class="fa-solid fa-shield-halved" style="color: #f59e0b; font-size: 20px;"></i>
+      </div>
+      <div class="brand-title">
+        <h1>KSR INSTITUTIONS</h1>
+        <p>CampusGuard Emergency SOS Portal</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="connection-badge" id="connBadge">
+        <span class="pulse-dot"></span>
+        <span id="connText">ONLINE</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- QUICK RED HELPLINE BAR -->
+  <div class="emergency-banner">
+    <div class="banner-text">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>CRITICAL EMERGENCY HELPLINE (24/7):</span>
+    </div>
+    <a href="tel:+919443310002" class="banner-call-btn">
+      <i class="fa-solid fa-phone"></i>
+      <span>CALL AMBULANCE (+91-94433-10002)</span>
+    </a>
+  </div>
+
+  <main class="container">
+    <!-- NAVIGATION TABS -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" data-tab="tab-report">
+        <i class="fa-solid fa-plus-circle"></i>
+        <span>Report Emergency</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-track">
+        <i class="fa-solid fa-truck-medical"></i>
+        <span>Live Ambulance Tracker</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-contacts">
+        <i class="fa-solid fa-phone-volume"></i>
+        <span>Helplines</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-map">
+        <i class="fa-solid fa-map-location-dot"></i>
+        <span>Campus Map</span>
+      </button>
+    </nav>
+
+    <!-- ACTIVE INCIDENT TRACKER (Shows when an incident is pending) -->
+    <div class="card active-tracker" id="activeTrackerCard">
+      <div class="tracker-header">
+        <div>
+          <span style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Active Incident Ticket</span>
+          <div class="ticket-id" id="ticketIdDisplay">KSR-000000</div>
+        </div>
+        <div class="status-badge reported" id="ticketStatusBadge">REPORTED</div>
+      </div>
+
+      <div class="stepper">
+        <div class="step-item active" id="step1">
+          <div class="step-circle"><i class="fa-solid fa-paper-plane"></i></div>
+          <span class="step-label">1. Reported</span>
+        </div>
+        <div class="step-item" id="step2">
+          <div class="step-circle"><i class="fa-solid fa-truck-medical"></i></div>
+          <span class="step-label">2. Dispatched</span>
+        </div>
+        <div class="step-item" id="step3">
+          <div class="step-circle"><i class="fa-solid fa-location-dot"></i></div>
+          <span class="step-label">3. Arrived</span>
+        </div>
+        <div class="step-item" id="step4">
+          <div class="step-circle"><i class="fa-solid fa-user-injured"></i></div>
+          <span class="step-label">4. In Transit</span>
+        </div>
+        <div class="step-item" id="step5">
+          <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+          <span class="step-label">5. Resolved</span>
+        </div>
+      </div>
+
+      <div class="driver-assigned-card" id="driverCard" style="display: none;">
+        <div class="driver-info">
+          <b id="driverTitle">Ambulance Team Assigned</b>
+          <span id="driverSub">Vehicle: TN-28-KSR-108 • ETA: ~4 Mins</span>
+        </div>
+        <a href="tel:+919443310002" class="btn-call-driver">
+          <i class="fa-solid fa-phone"></i> Call Driver
+        </a>
+      </div>
+    </div>
+
+    <!-- TAB 1: REPORT EMERGENCY FORM -->
+    <section id="tab-report" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-bell" style="color: #ef4444;"></i>
+          <span>Submit Emergency Ambulance Request</span>
+        </div>
+        <p class="card-sub">All medical, accident, and safety reports alert the KSR Ambulance Dispatch and Security Team
+          instantly.</p>
+
+        <form id="emergencyForm">
+          <!-- 1. EMERGENCY TYPE TILES -->
+          <div class="form-group full" style="margin-bottom: 12px;">
+            <label>Emergency Category <span class="req">*</span></label>
+            <div class="type-grid" id="typeGrid">
+              <div class="type-tile selected" data-type="Medical Emergency">
+                <i class="fa-solid fa-heart-pulse"></i>
+                <span>Medical / Injury</span>
+              </div>
+              <div class="type-tile" data-type="Accident / Crash">
+                <i class="fa-solid fa-car-burst"></i>
+                <span>Accident / Crash</span>
+              </div>
+              <div class="type-tile" data-type="Fire / Smoke Outbreak">
+                <i class="fa-solid fa-fire"></i>
+                <span>Fire / Smoke</span>
+              </div>
+              <div class="type-tile" data-type="Lab / Chemical Hazard">
+                <i class="fa-solid fa-flask-vial"></i>
+                <span>Lab / Hazard</span>
+              </div>
+              <div class="type-tile" data-type="Security / Assault">
+                <i class="fa-solid fa-shield-cat"></i>
+                <span>Security / Assault</span>
+              </div>
+              <div class="type-tile" data-type="Other Emergency">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>Other Urgent</span>
+              </div>
+            </div>
+            <input type="hidden" id="selectedType" value="Medical Emergency">
+          </div>
+
+          <!-- 2. PRIORITY SELECTOR -->
+          <div class="form-group full" style="margin-bottom: 14px;">
+            <label>Urgency Level <span class="req">*</span></label>
+            <div class="priority-row" id="priorityRow">
+              <div class="priority-pill critical selected" data-priority="Critical">🔴 CRITICAL (Immediate Life Threat)
+              </div>
+              <div class="priority-pill high" data-priority="High">🟠 HIGH (Severe / Urgent)</div>
+              <div class="priority-pill medium" data-priority="Medium">🟡 MEDIUM (Needs Assistance)</div>
+            </div>
+            <input type="hidden" id="selectedPriority" value="Critical">
+          </div>
+
+          <!-- 3. CAMPUS LOCATION -->
+          <div class="form-grid">
+            <div class="form-group full">
+              <label for="campusBlock"><i class="fa-solid fa-location-dot"></i> Campus Block / Building Location <span
+                  class="req">*</span></label>
+              <select id="campusBlock" required>
+                <option value="">-- Select KSR Campus Landmark --</option>
+                <option value="KSRCT - Main Administrative Block">KSRCT - Main Administrative Block</option>
+                <option value="KSRCT - Computer Science & IT Block">KSRCT - Computer Science & IT Block</option>
+                <option value="KSRCT - ECE & EEE Engineering Block">KSRCT - ECE & EEE Engineering Block</option>
+                <option value="KSRCT - Biotechnology & Chemistry Labs">KSRCT - Biotechnology & Chemistry Labs</option>
+                <option value="KSRCE - Mechanical Sciences & Civil Block">KSRCE - Mechanical Sciences & Civil Block
+                </option>
+                <option value="K.S.R. Institute for Dental Sciences & Hospital">K.S.R. Dental College & Hospital
+                </option>
+                <option value="KSRCAS - Arts & Science Block">KSRCAS - Arts & Science Block</option>
+                <option value="Central Library & Dr. K.S.R. Auditorium">Central Library & Dr. KSR Auditorium</option>
+                <option value="Boys Hostel - Cauvery Block">Boys Hostel - Cauvery Block</option>
+                <option value="Boys Hostel - Bhavani Block">Boys Hostel - Bhavani Block</option>
+                <option value="Girls Hostel - Amaravathi Block">Girls Hostel - Amaravathi Block</option>
+                <option value="Campus Food Court & Canteen">Campus Food Court & Canteen</option>
+                <option value="KSR Sports Stadium & Ground">KSR Sports Stadium & Ground</option>
+                <option value="Main Entrance Gate 1 (Security Post)">Main Entrance Gate 1 (Security Post)</option>
+                <option value="Tiruchengode Road Gate 2">Tiruchengode Road Gate 2</option>
+                <option value="KSR Health Centre & Dispensary">KSR Health Centre & Dispensary</option>
+              </select>
+            </div>
+
+            <!-- CURRENT LOCATION DETECTION CARD -->
+            <div class="form-group full">
+              <div class="current-location-card">
+                <div class="current-location-header">
+                  <div class="loc-title">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                    <span>Real-Time Current Location Service</span>
+                  </div>
+                  <button type="button" class="gps-btn-main" id="btnGetGps">
+                    <i class="fa-solid fa-crosshairs"></i>
+                    <span>📍 Use My Current Location</span>
+                  </button>
+                </div>
+
+                <div id="gpsStatusNotice" style="font-size: 12px; color: #94a3b8; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-satellite-dish"></i>
+                  <span id="gpsStatus">Click button to lock exact GPS coordinates for the ambulance team</span>
+                </div>
+
+                <!-- LIVE LOCATION DETAILS & MINI MAP -->
+                <div class="location-details-box" id="locationDetailsBox">
+                  <div class="auto-building-badge" id="autoBuildingBadge" style="display: none;">
+                    <i class="fa-solid fa-compass"></i>
+                    <span id="autoBuildingText">Detected Nearest Campus Landmark: KSRCT Main Admin</span>
+                  </div>
+
+                  <div class="loc-metric-grid">
+                    <div class="loc-metric-item">
+                      <span class="lbl">Latitude</span>
+                      <span class="val" id="dispLat">--.------° N</span>
+                    </div>
+                    <div class="loc-metric-item">
+                      <span class="lbl">Longitude</span>
+                      <span class="val" id="dispLng">--.------° E</span>
+                    </div>
+                    <div class="loc-metric-item">
+                      <span class="lbl">Accuracy Radius</span>
+                      <span class="val" id="dispAcc" style="color: #34d399;">±-- m</span>
+                    </div>
+                    <div class="loc-metric-item">
+                      <span class="lbl">Timestamp</span>
+                      <span class="val" id="dispTime" style="color: #cbd5e1;">--:--:--</span>
+                    </div>
+                  </div>
+
+                  <div class="mini-loc-map" id="miniMapContainer">
+                    <iframe id="locMapIframe" src="" loading="lazy"></iframe>
+                  </div>
+
+                  <div class="loc-actions-bar">
+                    <a href="#" target="_blank" class="btn-view-gmaps" id="btnOpenGmaps">
+                      <i class="fa-solid fa-arrow-up-right-from-square"></i> Open in Google Maps
+                    </a>
+                    <label class="live-track-toggle">
+                      <input type="checkbox" id="chkLiveWatch"> Keep Live-Tracking Location
+                    </label>
+                  </div>
+                </div>
+
+                <input type="hidden" id="geoLat">
+                <input type="hidden" id="geoLng">
+              </div>
+            </div>
+
+            <!-- 4. REPORTING PERSON (CLICKABLE ROLE OPTIONS) -->
+            <div class="form-group full" style="margin-top: 6px;">
+              <label><i class="fa-solid fa-users"></i> Reporting Person <span class="req">*</span></label>
+              <div class="role-grid" id="roleGrid">
+                <div class="role-tile selected" data-role="Student">
+                  <i class="fa-solid fa-graduation-cap"></i>
+                  <span>Student</span>
+                </div>
+                <div class="role-tile" data-role="Faculty">
+                  <i class="fa-solid fa-chalkboard-user"></i>
+                  <span>Faculty</span>
+                </div>
+                <div class="role-tile" data-role="Security">
+                  <i class="fa-solid fa-shield-halved"></i>
+                  <span>Security</span>
+                </div>
+                <div class="role-tile" data-role="Worker">
+                  <i class="fa-solid fa-helmet-safety"></i>
+                  <span>Worker</span>
+                </div>
+              </div>
+              <input type="hidden" id="selectedReporterRole" value="Student">
+            </div>
+
+            <!-- CONTACT PHONE -->
+            <div class="form-group full">
+              <label for="reporterPhone"><i class="fa-solid fa-phone"></i> Contact Mobile Number <span
+                  class="req">*</span></label>
+              <input type="tel" id="reporterPhone" placeholder="+91 XXXXX XXXXX" required>
+            </div>
+
+            <!-- 5. DESCRIPTION -->
+            <div class="form-group full">
+              <label for="description"><i class="fa-solid fa-comment-medical"></i> Emergency Description / Patient
+                Symptoms <span class="req">*</span></label>
+              <textarea id="description" rows="3"
+                placeholder="Describe what happened: e.g. Student fainted with severe dizziness; or motorcycle collision near hostel..."
+                required></textarea>
+            </div>
+          </div>
+
+          <!-- SUBMIT SOS BUTTON -->
+          <button type="submit" class="submit-sos-btn" id="btnSubmitSos">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>SEND EMERGENCY SOS REPORT NOW</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 2: LIVE TRACKER & INCIDENT HISTORY -->
+    <section id="tab-track" class="tab-content" style="display: none;">
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-clock-rotate-left" style="color: #38bdf8;"></i>
+          <span>My Reported Emergencies</span>
+        </div>
+        <p class="card-sub">Real-time status updates from the KSR Ambulance Dispatch team.</p>
+        <div id="incidentsList">
+          <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 20px;">No emergencies reported from
+            this device yet.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: EMERGENCY HELPLINES -->
+    <section id="tab-contacts" class="tab-content" style="display: none;">
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-phone-volume" style="color: #10b981;"></i>
+          <span>Official KSR Emergency Contacts</span>
+        </div>
+        <p class="card-sub">Tap any number to dial campus security or emergency services immediately.</p>
+        <div class="helpline-grid" id="helplineGrid">
+          <!-- Loaded dynamically from /api/contacts -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: CAMPUS MAP -->
+    <section id="tab-map" class="tab-content" style="display: none;">
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-map-marked-alt" style="color: #f59e0b;"></i>
+          <span>KSR Institution Campus Map</span>
+        </div>
+        <p class="card-sub">GPS reference: 11.3564° N, 77.8282° E • Tiruchengode, Namakkal, Tamil Nadu</p>
+        <div class="campus-map-box">
+          <iframe title="KSR Institution Campus Map"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=77.815%2C11.345%2C77.842%2C11.368&layer=mapnik&marker=11.3564%2C77.8282"></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- TOAST NOTIFICATION POPUP -->
+  <div class="toast-msg" id="toastMsg">
+    <i class="fa-solid fa-circle-check" style="color: #34d399;"></i>
+    <span id="toastText">Action completed successfully.</span>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      let activeIncidentId = null;
+      let myReportedIds = JSON.parse(localStorage.getItem("ksr_my_reports") || "[]");
+
+      const $ = id => document.getElementById(id);
+
+      function showToast(text, isError = false) {
+        const toast = $("toastMsg");
+        $("toastText").textContent = text;
+        toast.querySelector("i").className = isError ? "fa-solid fa-circle-exclamation" : "fa-solid fa-circle-check";
+        toast.querySelector("i").style.color = isError ? "#ef4444" : "#34d399";
+        toast.style.display = "flex";
+        setTimeout(() => { toast.style.display = "none"; }, 3500);
+      }
+
+      // TABS LOGIC
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+          document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+          btn.classList.add("active");
+          const target = $(btn.dataset.tab);
+          if (target) target.style.display = "block";
+        });
+      });
+
+      // EMERGENCY TYPE TILES
+      document.querySelectorAll(".type-tile").forEach(tile => {
+        tile.addEventListener("click", () => {
+          document.querySelectorAll(".type-tile").forEach(t => t.classList.remove("selected"));
+          tile.classList.add("selected");
+          $("selectedType").value = tile.dataset.type;
+        });
+      });
+
+
+      // REPORTING PERSON ROLE SELECTOR
+      document.querySelectorAll("#roleGrid .role-tile").forEach(tile => {
+        tile.addEventListener("click", () => {
+          document.querySelectorAll("#roleGrid .role-tile").forEach(t => t.classList.remove("selected"));
+          tile.classList.add("selected");
+          $("selectedReporterRole").value = tile.dataset.role;
+        });
+      });
+
+      // PRIORITY PILLS
+      document.querySelectorAll(".priority-pill").forEach(pill => {
+        pill.addEventListener("click", () => {
+          document.querySelectorAll(".priority-pill").forEach(p => p.classList.remove("selected"));
+          pill.classList.add("selected");
+          $("selectedPriority").value = pill.dataset.priority;
+        });
+      });
+
+      // ==========================================
+      // CURRENT LOCATION & CAMPUS GEOLOCATION SYSTEM
+      // ==========================================
+      const KSR_CAMPUS_LANDMARKS = [
+        { name: "KSRCT - Main Administrative Block", lat: 11.3565, lng: 77.8980 },
+        { name: "KSRCT - Computer Science & IT Block", lat: 11.3570, lng: 77.8975 },
+        { name: "KSRCT - ECE & EEE Engineering Block", lat: 11.3568, lng: 77.8972 },
+        { name: "KSRCT - Biotechnology & Chemistry Labs", lat: 11.3560, lng: 77.8970 },
+        { name: "KSRCE - Mechanical Sciences & Civil Block", lat: 11.3555, lng: 77.8990 },
+        { name: "K.S.R. Institute for Dental Sciences & Hospital", lat: 11.3580, lng: 77.8965 },
+        { name: "KSRCAS - Arts & Science Block", lat: 11.3550, lng: 77.8975 },
+        { name: "Central Library & Dr. K.S.R. Auditorium", lat: 11.3568, lng: 77.8985 },
+        { name: "Boys Hostel - Cauvery Block", lat: 11.3590, lng: 77.8995 },
+        { name: "Boys Hostel - Bhavani Block", lat: 11.3585, lng: 77.8990 },
+        { name: "Girls Hostel - Amaravathi Block", lat: 11.3540, lng: 77.8960 },
+        { name: "Campus Food Court & Canteen", lat: 11.3562, lng: 77.8988 },
+        { name: "KSR Sports Stadium & Ground", lat: 11.3545, lng: 77.9000 },
+        { name: "Main Entrance Gate 1 (Security Post)", lat: 11.3530, lng: 77.8980 },
+        { name: "Tiruchengode Road Gate 2", lat: 11.3575, lng: 77.9010 },
+        { name: "KSR Health Centre & Dispensary", lat: 11.3562, lng: 77.8982 }
+      ];
+
+      function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // meters
+        const phi1 = lat1 * Math.PI / 180;
+        const phi2 = lat2 * Math.PI / 180;
+        const dPhi = (lat2 - lat1) * Math.PI / 180;
+        const dLam = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
+                  Math.cos(phi1) * Math.cos(phi2) *
+                  Math.sin(dLam/2) * Math.sin(dLam/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return Math.round(R * c);
+      }
+
+      function findNearestCampusLandmark(lat, lng) {
+        let nearest = null;
+        let minDistance = Infinity;
+        for (const lm of KSR_CAMPUS_LANDMARKS) {
+          const dist = calculateDistanceMeters(lat, lng, lm.lat, lm.lng);
+          if (dist < minDistance) {
+            minDistance = dist;
+            nearest = { ...lm, distance: dist };
+          }
+        }
+        return nearest;
+      }
+
+      let watchId = null;
+
+      function applyLocation(pos) {
+        const lat = parseFloat(pos.coords.latitude.toFixed(6));
+        const lng = parseFloat(pos.coords.longitude.toFixed(6));
+        const acc = Math.round(pos.coords.accuracy);
+        const timeStr = new Date().toLocaleTimeString();
+
+        $("geoLat").value = lat;
+        $("geoLng").value = lng;
+
+        $("dispLat").textContent = `${lat}° N`;
+        $("dispLng").textContent = `${lng}° E`;
+        $("dispAcc").textContent = `±${acc} meters`;
+        $("dispTime").textContent = timeStr;
+
+        $("locationDetailsBox").style.display = "block";
+        $("gpsStatus").innerHTML = `<b style="color: #34d399;">✔ Current Location Locked!</b> (Accuracy: ±${acc}m)`;
+
+        // Google Maps Link
+        $("btnOpenGmaps").href = `https://www.google.com/maps?q=${lat},${lng}`;
+
+        // Embedded OpenStreetMap pin iframe
+        const bbox = `${lng-0.002},${lat-0.0015},${lng+0.002},${lat+0.0015}`;
+        $("locMapIframe").src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`;
+
+        // Nearest Campus Landmark Auto-Matching
+        const nearest = findNearestCampusLandmark(lat, lng);
+        if (nearest && nearest.distance < 1200) {
+          const select = $("campusBlock");
+          for (let i = 0; i < select.options.length; i++) {
+            if (select.options[i].value === nearest.name) {
+              select.selectedIndex = i;
+              break;
+            }
+          }
+          $("autoBuildingBadge").style.display = "flex";
+          $("autoBuildingText").textContent = `🎯 Auto-Detected Nearest Building: ${nearest.name} (~${nearest.distance}m away)`;
+        } else if (nearest) {
+          $("autoBuildingBadge").style.display = "flex";
+          $("autoBuildingText").textContent = `📍 Current Location Captured (Closest campus landmark: ${nearest.name}, ~${(nearest.distance/1000).toFixed(1)}km)`;
+        }
+
+        const btn = $("btnGetGps");
+        btn.classList.remove("loading");
+        btn.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i> <span>📍 Refresh My Location</span>`;
+      }
+
+      function fetchCurrentLocation() {
+        if (!navigator.geolocation) {
+          $("gpsStatus").textContent = "Geolocation is not supported by your browser";
+          showToast("Geolocation not supported by this browser", true);
+          return;
+        }
+
+        const btn = $("btnGetGps");
+        btn.classList.add("loading");
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Detecting GPS Satellite Fix...</span>`;
+        $("gpsStatus").textContent = "Requesting device GPS sensor...";
+
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            applyLocation(pos);
+            showToast("📍 Exact Current Location Acquired!");
+          },
+          err => {
+            btn.classList.remove("loading");
+            btn.innerHTML = `<i class="fa-solid fa-crosshairs"></i> <span>📍 Try Again</span>`;
+            let msg = err.message;
+            if (err.code === 1) {
+              msg = "Location permission denied. Please tap 'Allow' when your browser prompts for location.";
+            } else if (err.code === 2) {
+              msg = "Location unavailable. Please ensure GPS/Location is toggled ON on your phone.";
+            } else if (err.code === 3) {
+              msg = "Location request timed out. Please try again.";
+            }
+            $("gpsStatus").innerHTML = `<span style="color: #f87171;"><i class="fa-solid fa-triangle-exclamation"></i> ${msg}</span>`;
+            showToast(msg, true);
+          },
+          { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+        );
+      }
+
+      $("btnGetGps").addEventListener("click", fetchCurrentLocation);
+
+      $("chkLiveWatch")?.addEventListener("change", e => {
+        if (e.target.checked) {
+          if (!navigator.geolocation) return;
+          watchId = navigator.geolocation.watchPosition(
+            applyLocation,
+            err => console.warn("Watch position error:", err),
+            { enableHighAccuracy: true, maximumAge: 3000 }
+          );
+          showToast("Live continuous location tracking active");
+        } else {
+          if (watchId !== null) {
+            navigator.geolocation.clearWatch(watchId);
+            watchId = null;
+          }
+          showToast("Live tracking paused");
+        }
+      });
+
+
+
+      // FORM SUBMIT
+      $("emergencyForm").addEventListener("submit", async e => {
+        e.preventDefault();
+
+        const btn = $("btnSubmitSos");
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>DISPATCHING ALERT...</span>`;
+
+        const block = $("campusBlock").value;
+        const role = $("selectedReporterRole") ? $("selectedReporterRole").value : "Student";
+
+        const payload = {
+          type: $("selectedType").value,
+          priority: $("selectedPriority").value,
+          location: block,
+          landmark: block,
+          reporter: role,
+          role: role,
+          phone: $("reporterPhone").value,
+          description: $("description").value,
+          latitude: $("geoLat").value ? parseFloat($("geoLat").value) : null,
+          longitude: $("geoLng").value ? parseFloat($("geoLng").value) : null
+        };
+
+        try {
+          const res = await fetch("/api/incidents", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || "Failed to submit emergency report");
+          }
+
+          const inc = await res.json();
+          activeIncidentId = inc.id;
+          myReportedIds.unshift(inc.id);
+          localStorage.setItem("ksr_my_reports", JSON.stringify(myReportedIds));
+
+          showToast("🚨 EMERGENCY DISPATCH NOTIFIED! AMBULANCE EN ROUTE!");
+
+          // Reset form fields
+          $("emergencyForm").reset();
+          document.querySelectorAll("#roleGrid .role-tile").forEach(t => t.classList.remove("selected"));
+          const defaultRole = document.querySelector('#roleGrid .role-tile[data-role="Student"]');
+          if (defaultRole) defaultRole.classList.add("selected");
+          $("selectedReporterRole").value = "Student";
+          $("gpsStatus").textContent = "GPS not yet captured";
+
+          // Activate Live Tracker
+          renderTracker(inc);
+          refreshIncidentsList();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+
+        } catch (err) {
+          showToast(err.message, true);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> <span>SEND EMERGENCY SOS REPORT NOW</span>`;
+        }
+      });
+
+      // AUTOMATIC LOCATION SHUTDOWN & CLEANUP (Called when incident is resolved)
+      function closeAndResetLocationSystem(reason = "Incident Resolved") {
+        if (watchId !== null) {
+          navigator.geolocation.clearWatch(watchId);
+          watchId = null;
+        }
+
+        const chk = $("chkLiveWatch");
+        if (chk) chk.checked = false;
+
+        if ($("geoLat")) $("geoLat").value = "";
+        if ($("geoLng")) $("geoLng").value = "";
+
+        if ($("dispLat")) $("dispLat").textContent = "--.------° N";
+        if ($("dispLng")) $("dispLng").textContent = "--.------° E";
+        if ($("dispAcc")) $("dispAcc").textContent = "±-- m";
+        if ($("dispTime")) $("dispTime").textContent = "--:--:--";
+
+        const mapIframe = $("locMapIframe");
+        if (mapIframe) mapIframe.src = "about:blank";
+
+        const box = $("locationDetailsBox");
+        if (box) box.style.display = "none";
+        const badge = $("autoBuildingBadge");
+        if (badge) badge.style.display = "none";
+
+        const btn = $("btnGetGps");
+        if (btn) {
+          btn.classList.remove("loading");
+          btn.innerHTML = `<i class="fa-solid fa-crosshairs"></i> <span>📍 Use My Current Location</span>`;
+        }
+
+        const status = $("gpsStatus");
+        if (status) {
+          status.innerHTML = `<span style="color: #10b981;"><i class="fa-solid fa-circle-check"></i> Location system closed (${reason})</span>`;
+        }
+      }
+
+      function renderTracker(inc) {
+        if (!inc) return;
+        const card = $("activeTrackerCard");
+        card.style.display = "block";
+        $("ticketIdDisplay").textContent = inc.id;
+
+        const badge = $("ticketStatusBadge");
+        badge.className = "status-badge " + inc.status.toLowerCase();
+        badge.textContent = inc.status;
+
+        // Update Stepper
+        const steps = ["step1", "step2", "step3", "step4", "step5"];
+        steps.forEach(s => $(s).className = "step-item");
+
+        if (inc.status === "REPORTED") {
+          $("step1").className = "step-item active";
+        } else if (inc.status === "ACCEPTED") {
+          $("step1").className = "step-item done";
+          $("step2").className = "step-item active";
+          $("driverCard").style.display = "flex";
+          if (inc.eta) $("driverSub").textContent = `Vehicle: TN-28-KSR-108 • ETA: ${inc.eta}`;
+        } else if (inc.status === "ARRIVED") {
+          $("step1").className = "step-item done";
+          $("step2").className = "step-item done";
+          $("step3").className = "step-item active";
+          $("driverCard").style.display = "flex";
+          $("driverTitle").textContent = "Ambulance Has Arrived At Your Location!";
+          $("driverSub").textContent = "First responders are on site.";
+        } else if (inc.status === "PICKED_UP") {
+          $("step1").className = "step-item done";
+          $("step2").className = "step-item done";
+          $("step3").className = "step-item done";
+          $("step4").className = "step-item active";
+          $("driverCard").style.display = "flex";
+          $("driverTitle").textContent = "Patient Picked Up • In Transit";
+          $("driverSub").textContent = "Transporting to KSR Health Centre.";
+        } else if (inc.status === "RESOLVED") {
+          steps.forEach(s => $(s).className = "step-item done");
+          $("driverCard").style.display = "none";
+
+          // AUTOMATICALLY CLOSE LOCATION SYSTEM FROM STUDENT'S SIDE
+          closeAndResetLocationSystem("Service Completed & Handover Resolved");
+
+          let resolvedBanner = $("resolvedBannerBox");
+          if (!resolvedBanner) {
+            resolvedBanner = document.createElement("div");
+            resolvedBanner.id = "resolvedBannerBox";
+            $("activeTrackerCard").appendChild(resolvedBanner);
+          }
+          resolvedBanner.innerHTML = `
+            <div style="background: rgba(16, 185, 129, 0.15); border: 1.5px solid #10b981; border-radius: 12px; padding: 14px; margin-top: 14px; text-align: center; animation: fadeIn 0.4s ease;">
+              <i class="fa-solid fa-circle-check" style="font-size: 26px; color: #10b981; margin-bottom: 6px; display: block;"></i>
+              <b style="color: #fff; font-size: 15px; display: block;">Emergency Service Completed & Resolved!</b>
+              <p style="color: #94a3b8; font-size: 12.5px; margin: 4px 0 12px;">Ambulance team handover is complete. Live GPS tracking and location sharing have been automatically shut down.</p>
+              <button type="button" id="btnDismissResolved" style="background: linear-gradient(135deg, #0284c7, #2563eb); color: #fff; border: none; padding: 9px 20px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-circle-plus"></i> File New Emergency Report
+              </button>
+            </div>
+          `;
+          resolvedBanner.style.display = "block";
+
+          $("btnDismissResolved")?.addEventListener("click", () => {
+            $("activeTrackerCard").style.display = "none";
+            resolvedBanner.style.display = "none";
+            activeIncidentId = null;
+            const reportTab = document.querySelector('.tab-btn[data-tab="tab-report"]');
+            if (reportTab) reportTab.click();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+        }
+      }
+
+      // LOAD INCIDENT LIST
+      async function refreshIncidentsList() {
+        try {
+          const res = await fetch("/api/incidents");
+          if (!res.ok) return;
+          const all = await res.json();
+          const myIncidents = all.filter(i => myReportedIds.includes(i.id));
+
+          if (activeIncidentId) {
+            const current = all.find(i => i.id === activeIncidentId);
+            if (current) renderTracker(current);
+          } else if (myIncidents.length > 0 && myIncidents[0].status !== "RESOLVED") {
+            activeIncidentId = myIncidents[0].id;
+            renderTracker(myIncidents[0]);
+          }
+
+          const container = $("incidentsList");
+          if (myIncidents.length === 0) {
+            container.innerHTML = `<p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 20px;">No emergencies reported from this device yet.</p>`;
+            return;
+          }
+
+          container.innerHTML = myIncidents.map(i => `
+            <div style="background: #091326; border: 1px solid #1e3056; border-radius: 12px; padding: 14px; margin-bottom: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <b style="color: #fff; font-size: 14px;">${i.type}</b>
+                <span class="status-badge ${i.status.toLowerCase()}">${i.status}</span>
+              </div>
+              <p style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;">
+                <i class="fa-solid fa-location-dot" style="color: #ef4444;"></i> ${i.location}
+              </p>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #64748b; font-family: 'JetBrains Mono', monospace;">
+                <span>ID: ${i.id}</span>
+                <span>${new Date(i.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+              
+            </div>
+          `).join("");
+
+        } catch (e) {
+          console.error("Failed to fetch incidents", e);
+        }
+      }
+
+      // LOAD CONTACTS
+      async function loadContacts() {
+        try {
+          const res = await fetch("/api/contacts");
+          if (!res.ok) return;
+          const contacts = await res.json();
+          $("helplineGrid").innerHTML = contacts.map(c => `
+            <div class="helpline-card">
+              <div class="helpline-info">
+                <b>${c.name}</b>
+                <span>${c.role}</span>
+              </div>
+              <a href="tel:${c.phone}" class="helpline-dial-btn">
+                <i class="fa-solid fa-phone"></i> ${c.phone}
+              </a>
+            </div>
+          `).join("");
+        } catch (e) {
+          console.error("Failed to load contacts", e);
+        }
+      }
+
+      // REAL-TIME SSE STREAM & POLLING
+      function initRealtimeStream() {
+        if (!window.EventSource) {
+          setInterval(refreshIncidentsList, 2500);
+          return;
+        }
+
+        const source = new EventSource("/api/stream");
+        source.addEventListener("incident:new", () => refreshIncidentsList());
+        source.addEventListener("incident:update", evt => {
+          refreshIncidentsList();
+          try {
+            const inc = JSON.parse(evt.data);
+            if (inc.id === activeIncidentId) {
+              renderTracker(inc);
+              showToast(`Ambulance Status Updated: ${inc.status}`);
+            }
+          } catch { }
+        });
+
+        source.onopen = () => {
+          $("connText").textContent = "ONLINE";
+          $("connBadge").style.background = "rgba(16, 185, 129, 0.15)";
+          $("connBadge").style.color = "#34d399";
+        };
+
+        source.onerror = () => {
+          $("connText").textContent = "RECONNECTING";
+          $("connBadge").style.background = "rgba(245, 158, 11, 0.15)";
+          $("connBadge").style.color = "#f59e0b";
+        };
+      }
+
+      // INIT
+      loadContacts();
+      refreshIncidentsList();
+      initRealtimeStream();
+      setInterval(refreshIncidentsList, 3000);
+
+    })();
+  </script>
+</body>
+
+</html>

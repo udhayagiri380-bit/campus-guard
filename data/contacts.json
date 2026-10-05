@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "KSR Campus Security Control (Gate 1)",
+    "role": "24x7 Security & Tactical Command",
+    "phone": "+91-94433-10001",
+    "priority": "High"
+  },
+  {
+    "id": 2,
+    "name": "KSR Health Centre & Ambulance Bay",
+    "role": "Emergency Medical Care & 108 Ambulance",
+    "phone": "+91-94433-10002",
+    "priority": "Critical"
+  },
+  {
+    "id": 3,
+    "name": "KSR Fire & Disaster Safety Cell",
+    "role": "Fire Hazard, Rescue & Evacuation",
+    "phone": "+91-94433-10003",
+    "priority": "High"
+  },
+  {
+    "id": 4,
+    "name": "Hostel Emergency Warden (Boys & Girls)",
+    "role": "Hostel Welfare & First Aid Response",
+    "phone": "+91-94433-10004",
+    "priority": "Medium"
+  },
+  {
+    "id": 5,
+    "name": "Tiruchengode Municipal Govt Hospital",
+    "role": "External Emergency Referral Hospital",
+    "phone": "04288-252222",
+    "priority": "External"
+  },
+  {
+    "id": 6,
+    "name": "National Emergency Ambulance Hotline",
+    "role": "Government 108 Medical Dispatch",
+    "phone": "108",
+    "priority": "National"
+  }
+]
