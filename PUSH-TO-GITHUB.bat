@@ -15,6 +15,8 @@ echo Choose an authentication method:
 echo   [1] Interactive Web Browser Sign-In (Recommended - 1-Click)
 echo   [2] Paste GitHub Personal Access Token (PAT)
 echo.
+set "choice=1"
+set "token="
 set /p choice="Enter option (1 or 2, default is 1): "
 
 if "%choice%"=="2" (
