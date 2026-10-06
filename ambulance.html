@@ -43,6 +43,8 @@
       padding: 0;
     }
 
+
+
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: var(--bg);
@@ -1221,17 +1223,17 @@
         const phi2 = lat2 * Math.PI / 180;
         const dPhi = (lat2 - lat1) * Math.PI / 180;
         const dLam = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dPhi/2) * Math.sin(dPhi/2) +
-                  Math.cos(phi1) * Math.cos(phi2) *
-                  Math.sin(dLam/2) * Math.sin(dLam/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const a = Math.sin(dPhi / 2) * Math.sin(dPhi / 2) +
+          Math.cos(phi1) * Math.cos(phi2) *
+          Math.sin(dLam / 2) * Math.sin(dLam / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return Math.round(R * c);
       }
 
       function getDistanceBadge(item) {
         if (!driverLocation || !item.latitude || !item.longitude) return '';
         const meters = calculateDistanceMeters(driverLocation.lat, driverLocation.lng, item.latitude, item.longitude);
-        const text = meters < 1000 ? `${meters}m away` : `${(meters/1000).toFixed(1)}km away`;
+        const text = meters < 1000 ? `${meters}m away` : `${(meters / 1000).toFixed(1)}km away`;
         return `<span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-weight: 700; margin-left: auto;">📍 ~${text}</span>`;
       }
 
