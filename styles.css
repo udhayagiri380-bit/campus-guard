@@ -4,8 +4,8 @@
 
 :root {
   /* Tactical Color Palette */
-  --bg-core: #070a11;
-  --bg-surface: #0d131f;
+  --bg-core: #FFFFFF;
+  --bg-surface: #FFFFFF;
   --bg-surface-elevated: #131c2e;
   --bg-panel: rgba(15, 23, 42, 0.78);
   --bg-card: rgba(22, 33, 56, 0.65);
@@ -36,9 +36,9 @@
   --font-mono: 'JetBrains Mono', monospace;
 
   /* Text Colors */
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --text-muted: #666666;
   --text-cyan: #38bdf8;
 
   /* Shadows & Glass */
@@ -544,9 +544,9 @@ body::before {
 }
 
 .hud-btn {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
+  background: #FF6B00;
+  border: 1px solid #FF6B00;
+  color: #FFFFFF;
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
@@ -560,8 +560,8 @@ body::before {
 }
 
 .hud-btn:hover {
-  background: rgba(56, 189, 248, 0.12);
-  border-color: var(--accent-cyan);
+  background: #e65c00;
+  border-color: #e65c00;
   color: #fff;
 }
 
